@@ -5,7 +5,6 @@
 
 import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { parse as parseYaml } from 'yaml';
 import { parse as parseToml } from 'smol-toml';
 import type { Project } from './manifest.ts';
 
@@ -40,6 +39,47 @@ interface GovernanceTeam {
     projects?: GovernanceProject[];
     channels?: any[];
   };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function isGovernanceRepo(value: unknown): value is GovernanceRepo {
+  return isRecord(value) && typeof value.name === 'string';
+}
+
+function isGovernanceProject(value: unknown): value is GovernanceProject {
+  if (!isRecord(value) || typeof value.name !== 'string' || typeof value.slug !== 'string') {
+    return false;
+  }
+  if (value.repos !== undefined) {
+    if (!Array.isArray(value.repos) || !value.repos.every(isGovernanceRepo)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function isGovernanceTeam(value: unknown): value is GovernanceTeam {
+  if (!isRecord(value) || !isRecord(value.team)) {
+    return false;
+  }
+  const { team } = value;
+  if (typeof team.name !== 'string' || typeof team.slug !== 'string') {
+    return false;
+  }
+  if (team.projects !== undefined) {
+    if (!Array.isArray(team.projects) || !team.projects.every(isGovernanceProject)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function parseGovernanceTeamFile(content: string): GovernanceTeam | null {
+  const parsed = parseToml(content);
+  return isGovernanceTeam(parsed) ? parsed : null;
 }
 
 /**
@@ -88,9 +128,9 @@ export async function discoverProjectsFromGovernance(): Promise<Project[]> {
       const content = await readFile(filePath, 'utf-8');
       
       try {
-        const teamData = parseToml(content) as GovernanceTeam;
+        const teamData = parseGovernanceTeamFile(content);
         
-        if (!teamData.team?.projects) {
+        if (!teamData?.team.projects) {
           continue;
         }
         
