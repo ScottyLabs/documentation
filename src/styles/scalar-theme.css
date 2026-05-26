@@ -1,0 +1,14 @@
+/* Scalar theme integration for ScottyLabs docs */
+
+:root {
+  /* Custom color tokens for Starlight */
+  --sl-color-accent: #3b82f6;
+  --sl-color-accent-low: #60a5fa;
+  --sl-color-accent-high: #2563eb;
+}
+
+/* API reference pages styling */
+.api-reference-container {
+  width: 100%;
+  min-height: 100vh;
+}

@@ -1,0 +1,32 @@
+# Trigger Documentation Rebuild
+# Add this file to governance repository at: .forgejo/workflows/trigger-docs-rebuild.yml
+
+name: Trigger Documentation Rebuild
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'data/**'  # Only trigger when team/project data changes
+
+jobs:
+  trigger-docs:
+    runs-on: docker
+    steps:
+      - name: Notify documentation hub of governance changes
+        run: |
+          echo "🔔 Triggering documentation rebuild..."
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.DOCS_TRIGGER_TOKEN }}" \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            https://codeberg.org/api/v1/repos/scottylabs/documentation/dispatches \
+            -d '{"event_type": "governance-updated"}'
+          
+          if [ $? -eq 0 ]; then
+            echo "✅ Documentation rebuild triggered successfully"
+          else
+            echo "❌ Failed to trigger documentation rebuild"
+            exit 1
+          fi

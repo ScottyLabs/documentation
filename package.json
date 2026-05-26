@@ -1,0 +1,24 @@
+{
+  "name": "@scottylabs/documentation",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "bun run scripts/build.ts && astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.28.4",
+    "@scalar/astro": "^0.2.0",
+    "astro": "^4.16.17"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.1.14",
+    "@types/node": "^22.10.2",
+    "smol-toml": "^1.6.1",
+    "typescript": "^5.7.2",
+    "yaml": "^2.9.0"
+  }
+}

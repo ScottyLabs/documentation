@@ -1,0 +1,53 @@
+# ScottyLabs Documentation Projects
+#
+# IMPORTANT: Most projects are automatically discovered from governance.
+# Projects with `docs: true` flag in governance are automatically included.
+#
+# This file is for:
+# 1. The central org-level documentation repository (when created)
+# 2. Manual overrides for projects not in governance
+# 3. External documentation sources
+
+# Central ScottyLabs organization documentation
+# Uncomment when the scottylabs-docs repository is created:
+# [[project]]
+# slug = "scottylabs"
+# name = "ScottyLabs"
+# repo = "https://codeberg.org/scottylabs/scottylabs-docs"
+# type = "starlight"
+# docs_dir = "docs"
+# description = "Organization-wide guides, processes, and resources"
+
+# Projects with `docs: true` in governance are auto-discovered
+# No need to add them here unless you want to override defaults
+
+# Example configurations for manual additions:
+
+# Starlight project (Markdown documentation)
+# [[project]]
+# slug = "example-docs"
+# name = "Example Project"
+# repo = "https://codeberg.org/scottylabs/example-project"
+# type = "starlight"
+# docs_dir = "docs"
+# description = "Example project documentation"
+
+# Rust project (with rustdoc)
+# [[project]]
+# slug = "example-rust"
+# name = "Example Rust Library"
+# repo = "https://codeberg.org/scottylabs/example-rust"
+# type = "rust"
+# docs_dir = "docs"
+# description = "Rust library with API documentation"
+
+# OpenAPI project (API with OpenAPI spec)
+# [[project]]
+# slug = "example-api"
+# name = "Example API"
+# repo = "https://codeberg.org/scottylabs/example-api"
+# type = "openapi"
+# docs_dir = "docs"
+# openapi_spec = "openapi.json"
+# export_command = "cargo run --bin export-openapi"
+# description = "REST API with OpenAPI documentation"
