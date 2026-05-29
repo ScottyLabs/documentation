@@ -60,7 +60,7 @@ jobs:
           nix_path: nixpkgs=channel:nixos-unstable
       
       - name: Upload to Garage
-        run: nix run .#upload-garage
+        run: nix run .#upload-garage -- dist
         env:
           GARAGE_ENDPOINT: ${{ secrets.GARAGE_ENDPOINT }}
           GARAGE_ACCESS_KEY: ${{ secrets.GARAGE_ACCESS_KEY }}
