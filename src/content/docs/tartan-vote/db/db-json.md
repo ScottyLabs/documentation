@@ -6,10 +6,10 @@ repo: "https://codeberg.org/scottylabs/tartan-vote"
 ---
 # JSON Information
 
-- [vote.data](db-json/#votedata)
-- [event.data](db-json/#eventdata)
-- [organization.data](db-json/#organizationdata)
-- [log.data](db-json/#logdata)
+- [vote.data](#votedata)
+- [event.data](#eventdata)
+- [organization.data](#organizationdata)
+- [log.data](#logdata)
 
 ## `vote.data`
 

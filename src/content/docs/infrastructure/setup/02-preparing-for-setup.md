@@ -18,7 +18,7 @@ Here, you can switch the boot mode from the default (Legacy/BIOS) to UEFI via `V
 
 <img src="./assets/vm-boot-mode.png" alt="VM boot mode" height="300" />
 
-In this repository, add `hostname` to the `hosts` array in [flake.nix](../../flake.nix). If not already present, create a [user entry](../../users.nix) for yourself, following [these instructions](../create-user-entry/). Then, create `hosts/hostname/configuration.nix` following the pattern of the other hosts in [hosts/](../../hosts/):
+In this repository, add `hostname` to the `hosts` array in [flake.nix](https://codeberg.org/scottylabs/infrastructure/src/branch/main/flake.nix). If not already present, create a [user entry](https://codeberg.org/scottylabs/infrastructure/src/branch/main/users.nix) for yourself, following [these instructions](/infrastructure/create-user-entry/). Then, create `hosts/hostname/configuration.nix` following the pattern of the other hosts in [hosts/](https://codeberg.org/scottylabs/infrastructure/src/branch/main/hosts):
 
 ```nix
 { config, lib, pkgs, ... }:

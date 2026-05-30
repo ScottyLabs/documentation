@@ -27,7 +27,7 @@ let aggregationRedirects: Redirect[] = [];
 const SKIPPED_MARKDOWN_FILES = new Set(['SUMMARY.md', 'SUMMARY.mdx']);
 
 /** Starlight site shell — not project documentation. */
-const SKIPPED_SHELL_FILES = new Set(['index.mdx', 'getting-started.md']);
+const SKIPPED_SHELL_FILES = new Set(['index.mdx', 'getting-started.md', '404.md']);
 
 /**
  * Aggregate documentation from all Starlight projects
@@ -109,7 +109,7 @@ async function copyMarkdownFiles(
         entryRelativePath,
         normalizedRelativePath
       );
-      await processMarkdownFile(sourcePath, targetPath, project);
+      await processMarkdownFile(sourcePath, targetPath, project, normalizedRelativePath);
     }
   }
 }
@@ -195,14 +195,20 @@ function titleFromFrontmatter(frontmatter: string): string | undefined {
 async function processMarkdownFile(
   sourcePath: string,
   targetPath: string,
-  project: Project
+  project: Project,
+  sourceRelativePath: string
 ): Promise<void> {
   const content = await Bun.file(sourcePath).text();
   const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n/);
 
   const existingFrontmatter = frontmatterMatch?.[1] ?? '';
   const rawBody = frontmatterMatch ? content.slice(frontmatterMatch[0].length) : content;
-  const body = rewriteMarkdownLinks(rawBody);
+  const body = rewriteMarkdownLinks(rawBody, {
+    projectSlug: project.slug,
+    repo: project.repo,
+    docsDir: resolveProjectDocsDir(project),
+    sourceRelativePath,
+  });
   const title =
     titleFromFrontmatter(existingFrontmatter) ?? deriveTitle(body, basename(sourcePath));
   const frontmatter = buildFrontmatter(existingFrontmatter, title, project);

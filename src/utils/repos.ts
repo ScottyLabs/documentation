@@ -114,6 +114,11 @@ export function repoLinksFromEntry(entry: {
   data: { project?: string; repo?: string };
   slug: string;
 }): RepoLinksResult {
+  const pageSlug = entry.slug.replace(/\/$/, '');
+  if (pageSlug === '404') {
+    return { slug: pageSlug, links: [] };
+  }
+
   const slug = projectSlugFromEntry(entry);
 
   if (entry.data.repo) {

@@ -12,6 +12,7 @@ Welcome! This documentation hub aggregates documentation from multiple ScottyLab
 ## For Users
 
 Each project has its own section in the sidebar with:
+
 - **Guides**: Step-by-step tutorials
 - **API Docs**: Interactive API references (for projects with APIs)
 - **Rustdoc**: Generated documentation for Rust code
@@ -21,6 +22,7 @@ Each project has its own section in the sidebar with:
 To add a project to this hub, add `docs: true` flag in governance
 
 The build system will automatically:
+
 - Clone your repository
 - Extract documentation
 - Generate API references (if applicable)

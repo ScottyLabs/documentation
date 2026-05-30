@@ -20,13 +20,13 @@ scp ~/.ssh/id_ed25519 andrewid@hostname:~/.ssh/
 
 Once you're in, run `update` once. Always make sure to use the `update` alias for `sudo nixos-rebuild switch`, since it creates a btrfs backup first. You can use `rollback` if something goes wrong.
 
-Finally, add the VM's SSH host key to [`secrets.nix`](../../secrets.nix) so that agenix can encrypt secrets for this host:
+Finally, add the VM's SSH host key to [`secrets.nix`](https://codeberg.org/scottylabs/infrastructure/src/branch/main/secrets.nix) so that agenix can encrypt secrets for this host:
 
 ```bash
 cat /etc/ssh/ssh_host_ed25519_key.pub
 ```
 
-Copy the output and add it to [`secrets.nix`](../../secrets.nix) at the repo root:
+Copy the output and add it to [`secrets.nix`](https://codeberg.org/scottylabs/infrastructure/src/branch/main/secrets.nix) at the repo root:
 
 ```nix
 let
@@ -38,4 +38,4 @@ in
 }
 ```
 
-Commit this change to the repository. Finally, if this host will run services that use OpenBao secrets, follow the [Setting Up a New Host](../secrets/03-openbao/#setting-up-a-new-host) instructions.
+Commit this change to the repository. Finally, if this host will run services that use OpenBao secrets, follow the [Setting Up a New Host](/infrastructure/secrets/03-openbao/#setting-up-a-new-host) instructions.

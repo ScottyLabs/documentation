@@ -10,6 +10,16 @@
   --sl-right-sidebar-width: calc(var(--sl-sidebar-width) * 0.6);
 }
 
+/* Keep the full nav tree visible — do not clip groups on short pages. */
+:global(#starlight__sidebar .sidebar-content) {
+  height: auto !important;
+  min-height: 100%;
+}
+
+:global(#starlight__sidebar .sidebar-pane) {
+  overflow-y: auto;
+}
+
 @media (min-width: 72rem) {
   :global(.right-sidebar-container) {
     width: calc(

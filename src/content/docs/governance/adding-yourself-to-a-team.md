@@ -15,7 +15,7 @@ repo: "https://codeberg.org/scottylabs/governance"
 
 ## Steps
 
-1. Edit `data/teams/<team-slug>.toml` and add your **Codeberg username** to `members` (to join the whole team) or to a project's `members` under `[[team.projects]]` if membership is per-project. If your team is not yet created, follow the [team creation docs](creating-teams/) instead.
+1. Edit `data/teams/<team-slug>.toml` and add your **Codeberg username** to `members` (to join the whole team) or to a project's `members` under `[[team.projects]]` if membership is per-project. If your team is not yet created, follow the [team creation docs](/governance/creating-teams/) instead.
 2. [Set up your Matrix](#set-up-your-matrix-login-on-httpsmatrixdoggylabsorg)
 3. Open a pull request on Codeberg.
 
@@ -26,4 +26,4 @@ repo: "https://codeberg.org/scottylabs/governance"
 1. Log into Matrix (using https://matrix.doggylabs.org as the homeserver)
 2. Open a DM with `@discord:doggylabs.org` and send `login`. Use `login token` in DMs with `@slack:doggylabs.org`.
 
-Tech Lead setup to enable the shared relay is documented in [creating-teams.md](creating-teams/#infrastructure-prerequisites).
+Tech Lead setup to enable the shared relay is documented in [creating-teams.md](/governance/creating-teams/#infrastructure-prerequisites).

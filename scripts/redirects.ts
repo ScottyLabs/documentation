@@ -1,5 +1,5 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 
 export interface Redirect {
   /** Site path without leading/trailing slashes, e.g. `tartan-vote/CONTRIBUTING` */
@@ -8,7 +8,34 @@ export interface Redirect {
   to: string;
 }
 
+export interface LinkRewriteContext {
+  projectSlug: string;
+  repo: string;
+  docsDir: string;
+  /** Path of the markdown file relative to the project's docs directory */
+  sourceRelativePath: string;
+}
+
 export const REDIRECTS_FILE = '.build/redirects.json';
+
+const MARKDOWN_EXTENSION = /\.mdx?$/i;
+const REPO_FILE_EXTENSION = /\.(nix|tf|yaml|yml|json|age|rs|toml|example)$/i;
+const NON_DOMAIN_TLDS = new Set([
+  'md',
+  'mdx',
+  'json',
+  'yaml',
+  'yml',
+  'nix',
+  'tf',
+  'rs',
+  'toml',
+  'age',
+  'example',
+  'txt',
+  'csv',
+  'pdf',
+]);
 
 export function normalizeEntryName(name: string): string {
   const dot = name.lastIndexOf('.');
@@ -76,19 +103,119 @@ export function addRedirect(redirects: Redirect[], from: string, to: string): vo
   }
 }
 
-export function rewriteMarkdownLinks(body: string): string {
+function looksLikeExternalUrl(path: string): boolean {
+  const host = path.split('/')[0];
+  const match = /^[a-zA-Z0-9][a-zA-Z0-9.-]*\.([a-zA-Z]{2,})$/.exec(host);
+  if (!match) {
+    return false;
+  }
+  return !NON_DOMAIN_TLDS.has(match[1].toLowerCase());
+}
+
+function resolveRelativePath(baseDir: string, linkPath: string): string {
+  const normalizedBase = baseDir === '.' ? '' : baseDir;
+  const baseParts = normalizedBase.split(/[/\\]/).filter(Boolean);
+  const linkParts = linkPath.split('/').filter((part) => part !== '');
+
+  for (const part of linkParts) {
+    if (part === '.') {
+      continue;
+    }
+    if (part === '..') {
+      baseParts.pop();
+    } else {
+      baseParts.push(part);
+    }
+  }
+
+  return baseParts.join('/');
+}
+
+function repoBlobUrl(repo: string, repoRelativePath: string): string {
+  const base = repo.replace(/\.git$/, '');
+  return `${base}/src/branch/main/${repoRelativePath}`;
+}
+
+function resolveRepoPath(context: LinkRewriteContext, linkPath: string): string {
+  const pathPart = linkPath.split('#')[0].replace(/\/$/, '');
+  const docFileInRepo = join(context.docsDir, context.sourceRelativePath).replace(/\\/g, '/');
+  const docDir = dirname(docFileInRepo);
+
+  // Repo-root paths linked from docs/ often omit ../ (e.g. schemas/team.schema.json).
+  if (/^schemas\//.test(pathPart) && !pathPart.includes('..')) {
+    return resolveRelativePath(docDir, `../${pathPart}`);
+  }
+
+  return resolveRelativePath(docDir, pathPart);
+}
+
+function resolveDocPath(sourceRelativePath: string, linkPath: string): string {
+  const pathPart = linkPath.split('#')[0].replace(/\/$/, '').replace(MARKDOWN_EXTENSION, '');
+  const sourceDir = dirname(sourceRelativePath).replace(/\\/g, '/');
+  return resolveRelativePath(sourceDir, pathPart.replace(/^docs\//, ''));
+}
+
+function isDocLink(context: LinkRewriteContext, linkPath: string): boolean {
+  const pathPart = linkPath.split('#')[0].replace(/\/$/, '');
+
+  if (REPO_FILE_EXTENSION.test(pathPart)) {
+    return false;
+  }
+
+  const docDirInRepo = join(context.docsDir, dirname(context.sourceRelativePath)).replace(/\\/g, '/');
+  const resolvedRepoPath = resolveRelativePath(
+    docDirInRepo,
+    pathPart.replace(/^docs\//, '')
+  );
+  const docsRoot = context.docsDir.replace(/\\/g, '/');
+
+  return resolvedRepoPath === docsRoot || resolvedRepoPath.startsWith(`${docsRoot}/`);
+}
+
+function toSitePath(projectSlug: string, docRelativePath: string, hash?: string): string {
+  const withExt = MARKDOWN_EXTENSION.test(docRelativePath) ? docRelativePath : `${docRelativePath}.md`;
+  const urlPath = filePathToUrlPath(projectSlug, withExt);
+  return `/${urlPath}/${hash ?? ''}`;
+}
+
+export function rewriteMarkdownLinks(body: string, context?: LinkRewriteContext): string {
   return body.replace(
     /\[([^\]]*)\]\(([^)#\s]+)(#[^)]*)?\)/g,
     (match, text: string, path: string, hash?: string) => {
-      if (/^(https?:|mailto:|\/)/.test(path)) {
-        return match;
-      }
-      if (!/\.mdx?$/i.test(path)) {
+      const hashSuffix = hash ?? '';
+
+      if (/^(https?:|mailto:|tel:|\/)/.test(path)) {
         return match;
       }
 
-      const normalized = normalizeMarkdownLink(path);
-      return `[${text}](${normalized}${hash ?? ''})`;
+      if (looksLikeExternalUrl(path)) {
+        return `[${text}](https://${path}${hashSuffix})`;
+      }
+
+      if (!context) {
+        if (!MARKDOWN_EXTENSION.test(path)) {
+          return match;
+        }
+        const normalized = normalizeMarkdownLink(path);
+        return `[${text}](${normalized}${hashSuffix})`;
+      }
+
+      if (isDocLink(context, path)) {
+        const docPath = resolveDocPath(context.sourceRelativePath, path);
+        const sourceBase = basename(context.sourceRelativePath)
+          .replace(MARKDOWN_EXTENSION, '')
+          .toLowerCase();
+        const targetBase = basename(docPath).replace(MARKDOWN_EXTENSION, '').toLowerCase();
+
+        if (targetBase === sourceBase) {
+          return hashSuffix ? `[${text}](${hashSuffix})` : match;
+        }
+
+        return `[${text}](${toSitePath(context.projectSlug, docPath, hashSuffix)})`;
+      }
+
+      const repoPath = resolveRepoPath(context, path);
+      return `[${text}](${repoBlobUrl(context.repo, repoPath)}${hashSuffix})`;
     }
   );
 }
@@ -97,8 +224,8 @@ function normalizeMarkdownLink(path: string): string {
   const segments = path.split('/');
 
   const normalized = segments.map((segment, index) => {
-    if (index === segments.length - 1 && /\.mdx?$/i.test(segment)) {
-      const base = segment.replace(/\.mdx?$/i, '');
+    if (index === segments.length - 1 && MARKDOWN_EXTENSION.test(segment)) {
+      const base = segment.replace(MARKDOWN_EXTENSION, '');
       if (base.toLowerCase() === 'index') {
         return 'index';
       }

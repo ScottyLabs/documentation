@@ -29,7 +29,7 @@ Before continuing, you must have permissions on NetReg. If you do not have permi
 * Hardware Address: The MAC address provided by Computing Services
 * Affiliation: `ScottyLabs`
 
-You must then wait for the public IP to be assigned to the VM, which can take up to 30 minutes. Once you have the IP, declare an `A` record by adding an entry to `local.a_records` in [`tofu/cloudflare/records.tf`](../../tofu/cloudflare/records.tf):
+You must then wait for the public IP to be assigned to the VM, which can take up to 30 minutes. Once you have the IP, declare an `A` record by adding an entry to `local.a_records` in [`tofu/cloudflare/records.tf`](https://codeberg.org/scottylabs/infrastructure/src/branch/main/tofu/cloudflare/records.tf):
 
 ```hcl
 hostname = { ip = "<public-ip>", comment = "Campus Cloud VM (https://netreg.net.cmu.edu/)" }

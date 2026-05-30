@@ -8,7 +8,7 @@ repo: "https://codeberg.org/scottylabs/tartan-vote"
 
 Thanks for your interest in contributing to Tartan Vote!
 
-Before contributing to this repository, please discuss the change you wish to make via issue on this repository, email to one of the codeowners, or on the ScottyLabs [discord](go.scottylabs.org/discord).
+Before contributing to this repository, please discuss the change you wish to make via issue on this repository, email to one of the codeowners, or on the ScottyLabs [discord](https://go.scottylabs.org/discord).
 
 ## How Can I Contribute?
 
@@ -16,7 +16,7 @@ For now, please just refer to the communication channels listed above. As this p
 
 ## Documentation
 
-When making a change, it would be wonderful if you could update the corresponding documentation. If you cannot or are unsure how to, please leave an issue or let [Yiyoung Liu](github.com/maybe-yiyi) know so that the documentation does not lag behind. If the documentation does not exist, don't worry about it! (or write the documentation yourself, that would be greatly appreciated.)
+When making a change, it would be wonderful if you could update the corresponding documentation. If you cannot or are unsure how to, please leave an issue or let [Yiyoung Liu](https://github.com/maybe-yiyi) know so that the documentation does not lag behind. If the documentation does not exist, don't worry about it! (or write the documentation yourself, that would be greatly appreciated.)
 
 ## Pull Requests
 

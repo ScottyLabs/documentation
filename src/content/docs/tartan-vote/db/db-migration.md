@@ -16,7 +16,7 @@ To create a new migration file, navigate to the `crates` folder and run
 backend/crates $ sea-orm-cli migrate generate MIGRATION_NAME
 ```
 
-To migrate the database, follow the steps in [SETUP.md](../setup/#backend) or for short, run
+To migrate the database, follow the steps in [SETUP.md](/tartan-vote/setup/#backend) or for short, run
 
 ```sh
 backend/crates/voting-app $ cargo run

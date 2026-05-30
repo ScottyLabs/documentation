@@ -139,10 +139,20 @@ export default defineConfig({
         github: 'https://github.com/ScottyLabs',
       },
       components: {
+        Page: './src/components/Page.astro',
         Pagination: './src/components/Pagination.astro',
         Sidebar: './src/components/Sidebar.astro',
       },
       sidebar: ${JSON.stringify(sidebar, null, 8).replace(/"([^"]+)":/g, '$1:')},
+      head: [
+        {
+          tag: 'meta',
+          attrs: {
+            'http-equiv': 'Cache-Control',
+            content: 'no-cache, no-store, must-revalidate',
+          },
+        },
+      ],
       customCss: [
         './src/styles/scalar-theme.css',
       ],

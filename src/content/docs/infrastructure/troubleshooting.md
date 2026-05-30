@@ -185,7 +185,7 @@ sudo yq '.encryption.pickle_key' /var/lib/mautrix-slack/config.yaml
 head -c 32 /dev/urandom | base64
 ```
 
-Add to `secrets/infra-01/double-puppet-env.age` (same file as `DOUBLE_PUPPET_SECRET`; see [`double-puppet-env.example`](../secrets/infra-01/double-puppet-env.example)):
+Add to `secrets/infra-01/double-puppet-env.age` (same file as `DOUBLE_PUPPET_SECRET`; see [`double-puppet-env.example`](https://codeberg.org/scottylabs/infrastructure/src/branch/main/secrets/infra-01/double-puppet-env.example)):
 
 ```bash
 ENCRYPTION_PICKLE_KEY=<paste key here>
@@ -259,7 +259,7 @@ Per-message Slack avatars require a **Slack app** relay (`login app`), not a use
 
 **1. Create the Slack app** (Slack workspace admin, one-time):
 
-- Manifest: [`infrastructure/services/matrix/slack-app-manifest.yaml`](../services/matrix/slack-app-manifest.yaml) (includes `chat:write.customize`).
+- Manifest: [`infrastructure/services/matrix/slack-app-manifest.yaml`](https://codeberg.org/scottylabs/infrastructure/src/branch/main/services/matrix/slack-app-manifest.yaml) (includes `chat:write.customize`).
 - Create app → install to workspace `scottylabs` → note **bot token** (`xoxb-`) and **app token** (`xapp-`, socket mode).
 - **Invite the app bot** to every bridged Slack channel (DevOps `C08K3Q77ZQF`, hub `C096TM8EMS8`, quest, cmu-courses, etc.).
 
@@ -272,7 +272,7 @@ list-logins
 
 Copy the new app login ID. Optionally `logout <old-user-login-id>` after cutover.
 
-**3. Store secrets** — edit `secrets/infra-01/double-puppet-env.age` (template: [`double-puppet-env.example`](../secrets/infra-01/double-puppet-env.example)):
+**3. Store secrets** — edit `secrets/infra-01/double-puppet-env.age` (template: [`double-puppet-env.example`](https://codeberg.org/scottylabs/infrastructure/src/branch/main/secrets/infra-01/double-puppet-env.example)):
 
 ```bash
 PUBLIC_MEDIA_SIGNING_KEY=<head -c 32 /dev/urandom | base64>
@@ -340,7 +340,7 @@ After deploy, test: reply in the main channel should appear in the Slack thread 
 
 (`enable_webhook_avatars` and `bridge.public_address` must be set — see `mautrix-discord.nix`. Caddy must proxy `/mautrix-discord/*` to the discord appservice on port 29334 with **`handle`**, not `handle_path`.)
 
-Add stable keys to `secrets/infra-01/double-puppet-env.age` (see [`double-puppet-env.example`](../secrets/infra-01/double-puppet-env.example)), then re-encrypt and redeploy:
+Add stable keys to `secrets/infra-01/double-puppet-env.age` (see [`double-puppet-env.example`](https://codeberg.org/scottylabs/infrastructure/src/branch/main/secrets/infra-01/double-puppet-env.example)), then re-encrypt and redeploy:
 
 ```bash
 PUBLIC_MEDIA_SIGNING_KEY=<random base64>

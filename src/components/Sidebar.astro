@@ -14,3 +14,34 @@ const { sidebar } = Astro.props;
 <div class="md:sl-hidden">
 	<MobileMenuFooter {...Astro.props} />
 </div>
+
+<script is:inline>
+	(() => {
+		const resetSidebar = () => {
+			try {
+				sessionStorage.removeItem('sl-sidebar-state');
+				sessionStorage.removeItem('sl-sidebar-scroll');
+			} catch {}
+
+		const scroller = document.getElementById('starlight__sidebar');
+		if (scroller) {
+			const current = scroller.querySelector('a[aria-current="page"]');
+			if (current) {
+				current.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+			} else {
+				scroller.scrollTop = 0;
+			}
+		}
+		};
+
+		resetSidebar();
+
+		// Back/forward cache can restore an old sidebar DOM (e.g. Welcome-only).
+		window.addEventListener('pageshow', (event) => {
+			if (event.persisted) {
+				resetSidebar();
+				location.reload();
+			}
+		});
+	})();
+</script>

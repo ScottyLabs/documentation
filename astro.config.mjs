@@ -11,6 +11,7 @@ export default defineConfig({
         github: 'https://github.com/ScottyLabs',
       },
       components: {
+        Page: './src/components/Page.astro',
         Pagination: './src/components/Pagination.astro',
         Sidebar: './src/components/Sidebar.astro',
       },
@@ -70,6 +71,15 @@ export default defineConfig({
                 collapsed: false
         }
 ],
+      head: [
+        {
+          tag: 'meta',
+          attrs: {
+            'http-equiv': 'Cache-Control',
+            content: 'no-cache, no-store, must-revalidate',
+          },
+        },
+      ],
       customCss: [
         './src/styles/scalar-theme.css',
       ],
