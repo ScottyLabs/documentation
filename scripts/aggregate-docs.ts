@@ -3,12 +3,15 @@
  * Handles copying and merging markdown content from projects
  */
 
-import { mkdir, cp, readdir, stat } from 'node:fs/promises';
-import { join, relative, basename } from 'node:path';
+import { mkdir, readdir, stat } from 'node:fs/promises';
+import { join, basename } from 'node:path';
 import type { Project } from './manifest.ts';
 import { resolveProjectRepoRoot } from './manifest.ts';
 
 const CONTENT_DIR = 'src/content/docs';
+
+/** mdBook and similar tools use these as navigation metadata, not pages. */
+const SKIPPED_MARKDOWN_FILES = new Set(['SUMMARY.md', 'SUMMARY.mdx']);
 
 /**
  * Aggregate documentation from all Starlight projects
@@ -71,10 +74,78 @@ async function copyMarkdownFiles(
     if (entry.isDirectory()) {
       await mkdir(targetPath, { recursive: true });
       await copyMarkdownFiles(sourcePath, targetPath, project, entryRelativePath);
-    } else if (entry.isFile() && (entry.name.endsWith('.md') || entry.name.endsWith('.mdx'))) {
+    } else if (entry.isFile() && isAggregateableMarkdown(entry.name)) {
       await processMarkdownFile(sourcePath, targetPath, project);
     }
   }
+}
+
+function isAggregateableMarkdown(name: string): boolean {
+  if (!name.endsWith('.md') && !name.endsWith('.mdx')) {
+    return false;
+  }
+  return !SKIPPED_MARKDOWN_FILES.has(name);
+}
+
+function formatLabel(name: string): string {
+  return name
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+function deriveTitle(body: string, filename: string): string {
+  const h1 = body.match(/^#\s+(.+?)\s*$/m);
+  if (h1) {
+    return h1[1].replace(/\s*\{#.*\}$/, '').trim();
+  }
+
+  const base = basename(filename).replace(/\.(md|mdx)$/, '');
+  if (base.toLowerCase() === 'index' || base.toLowerCase() === 'readme') {
+    return 'Overview';
+  }
+
+  return formatLabel(base);
+}
+
+function stripFrontmatterKeys(frontmatter: string, keys: string[]): string {
+  const pattern = new RegExp(`^(${keys.join('|')}):.*(?:\\n|$)`, 'gm');
+  return frontmatter.replace(pattern, '').trim();
+}
+
+function buildFrontmatter(
+  existingFrontmatter: string,
+  title: string,
+  project: Project
+): string {
+  const preserved = stripFrontmatterKeys(existingFrontmatter, ['title', 'project', 'projectType']);
+
+  return [
+    `title: ${JSON.stringify(title)}`,
+    preserved,
+    `project: ${JSON.stringify(project.slug)}`,
+    `projectType: ${JSON.stringify(project.type)}`,
+  ]
+    .filter(Boolean)
+    .join('\n');
+}
+
+function titleFromFrontmatter(frontmatter: string): string | undefined {
+  const match = frontmatter.match(/^title:\s*(.+)$/m);
+  if (!match) {
+    return undefined;
+  }
+
+  const raw = match[1].trim();
+  if (raw.startsWith('"') || raw.startsWith("'")) {
+    try {
+      return JSON.parse(raw.replace(/^'/, '"').replace(/'$/, '"'));
+    } catch {
+      return raw.replace(/^['"]|['"]$/g, '');
+    }
+  }
+
+  return raw;
 }
 
 /**
@@ -86,34 +157,15 @@ async function processMarkdownFile(
   project: Project
 ): Promise<void> {
   const content = await Bun.file(sourcePath).text();
-  
-  // Parse frontmatter if it exists
   const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n/);
-  
-  let processedContent: string;
-  
-  if (frontmatterMatch) {
-    // Add project metadata to existing frontmatter
-    const existingFrontmatter = frontmatterMatch[1];
-    const restContent = content.slice(frontmatterMatch[0].length);
-    
-    processedContent = `---
-${existingFrontmatter}
-project: "${project.slug}"
-projectType: "${project.type}"
----
-${restContent}`;
-  } else {
-    // Add new frontmatter with project metadata
-    processedContent = `---
-project: "${project.slug}"
-projectType: "${project.type}"
----
 
-${content}`;
-  }
-  
-  await Bun.write(targetPath, processedContent);
+  const existingFrontmatter = frontmatterMatch?.[1] ?? '';
+  const body = frontmatterMatch ? content.slice(frontmatterMatch[0].length) : content;
+  const title =
+    titleFromFrontmatter(existingFrontmatter) ?? deriveTitle(body, basename(sourcePath));
+  const frontmatter = buildFrontmatter(existingFrontmatter, title, project);
+
+  await Bun.write(targetPath, `---\n${frontmatter}\n---\n${body}`);
 }
 
 /**
