@@ -12,11 +12,14 @@ export default defineConfig({
       },
       components: {
         Pagination: './src/components/Pagination.astro',
+        Sidebar: './src/components/Sidebar.astro',
       },
       sidebar: [
         {
           label: 'Welcome',
+          collapsed: false,
           items: [
+            { label: 'Home', link: '/' },
             { label: 'Getting Started', link: '/getting-started/' },
           ],
         },

@@ -14,18 +14,9 @@ Each project has its own section in the sidebar with:
 - **API Docs**: Interactive API references (for projects with APIs)
 - **Rustdoc**: Generated documentation for Rust code
 
-## For Contributors
-
-To add your project to this documentation hub, see the [Contributing Guide](#contributing).
-
 ### Contributing
 
-To add a project to this hub:
-
-1. Fork the documentation repository
-2. Add your project to `projects.toml`
-3. Ensure your project has documentation in a `docs/` directory
-4. Submit a pull request
+To add a project to this hub, add `docs: true` flag in governance
 
 The build system will automatically:
 - Clone your repository

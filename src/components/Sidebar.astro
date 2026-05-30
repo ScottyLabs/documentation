@@ -1,0 +1,16 @@
+---
+import type { Props } from '@astrojs/starlight/props';
+import MobileMenuFooter from 'virtual:starlight/components/MobileMenuFooter';
+import SidebarSublist from './SidebarSublist.astro';
+import SidebarPersister from './SidebarPersister.astro';
+
+const { sidebar } = Astro.props;
+---
+
+<SidebarPersister {...Astro.props}>
+	<SidebarSublist sublist={sidebar} />
+</SidebarPersister>
+
+<div class="md:sl-hidden">
+	<MobileMenuFooter {...Astro.props} />
+</div>
