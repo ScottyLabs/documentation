@@ -6,12 +6,19 @@
 import { mkdir, readdir, stat } from 'node:fs/promises';
 import { join, basename } from 'node:path';
 import type { Project } from './manifest.ts';
-import { resolveProjectRepoRoot } from './manifest.ts';
+import {
+  isDocumentationHubProject,
+  resolveProjectDocsDir,
+  resolveProjectRepoRoot,
+} from './manifest.ts';
 
 const CONTENT_DIR = 'src/content/docs';
 
 /** mdBook and similar tools use these as navigation metadata, not pages. */
 const SKIPPED_MARKDOWN_FILES = new Set(['SUMMARY.md', 'SUMMARY.mdx']);
+
+/** Starlight site shell — not project documentation. */
+const SKIPPED_SHELL_FILES = new Set(['index.mdx', 'getting-started.md']);
 
 /**
  * Aggregate documentation from all Starlight projects
@@ -35,8 +42,13 @@ async function aggregateProjectDocs(project: Project): Promise<void> {
   console.log(`  Processing ${project.name}...`);
   
   const repoPath = resolveProjectRepoRoot(project);
-  const sourceDocs = join(repoPath, project.docs_dir);
+  const sourceDocs = join(repoPath, resolveProjectDocsDir(project));
   const targetDocs = join(CONTENT_DIR, project.slug);
+
+  if (isDocumentationHubProject(project) && sourceDocs.replace(/\\/g, '/').includes('src/content')) {
+    console.warn(`  ⚠️  Refusing to aggregate Starlight shell from ${sourceDocs}`);
+    return;
+  }
   
   // Check if docs directory exists
   try {
@@ -74,17 +86,23 @@ async function copyMarkdownFiles(
     if (entry.isDirectory()) {
       await mkdir(targetPath, { recursive: true });
       await copyMarkdownFiles(sourcePath, targetPath, project, entryRelativePath);
-    } else if (entry.isFile() && isAggregateableMarkdown(entry.name)) {
+    } else if (entry.isFile() && isAggregateableMarkdown(entry.name, project)) {
       await processMarkdownFile(sourcePath, targetPath, project);
     }
   }
 }
 
-function isAggregateableMarkdown(name: string): boolean {
+function isAggregateableMarkdown(name: string, project: Project): boolean {
   if (!name.endsWith('.md') && !name.endsWith('.mdx')) {
     return false;
   }
-  return !SKIPPED_MARKDOWN_FILES.has(name);
+  if (SKIPPED_MARKDOWN_FILES.has(name)) {
+    return false;
+  }
+  if (isDocumentationHubProject(project) && SKIPPED_SHELL_FILES.has(name)) {
+    return false;
+  }
+  return true;
 }
 
 function formatLabel(name: string): string {

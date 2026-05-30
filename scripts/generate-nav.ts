@@ -3,9 +3,9 @@
  * Dynamically generates Starlight sidebar from project manifest
  */
 
-import { writeFile } from 'node:fs/promises';
+import { writeFile, stat } from 'node:fs/promises';
 import { readdir } from 'node:fs/promises';
-import { join, basename } from 'node:path';
+import { join } from 'node:path';
 import type { Project } from './manifest.ts';
 
 const CONTENT_DIR = 'src/content/docs';
@@ -13,12 +13,14 @@ const CONTENT_DIR = 'src/content/docs';
 interface SidebarItem {
   label: string;
   link?: string;
+  autogenerate?: { directory: string; collapsed?: boolean };
   items?: SidebarItem[];
 }
 
 interface SidebarGroup {
   label: string;
-  items: SidebarItem[];
+  items?: SidebarItem[];
+  autogenerate?: { directory: string; collapsed?: boolean };
   collapsed?: boolean;
 }
 
@@ -31,6 +33,7 @@ export async function generateNavigation(projects: Project[]): Promise<void> {
   const sidebar: (SidebarGroup | SidebarItem)[] = [
     {
       label: 'Welcome',
+      collapsed: false,
       items: [
         { label: 'Home', link: '/' },
         { label: 'Getting Started', link: '/getting-started/' },
@@ -56,120 +59,67 @@ export async function generateNavigation(projects: Project[]): Promise<void> {
  * Generate sidebar section for a single project
  */
 async function generateProjectSection(project: Project): Promise<SidebarGroup | null> {
-  const projectDocsPath = join(CONTENT_DIR, project.slug);
-  
-  let items: SidebarItem[] = [];
-  
-  // For Starlight projects, scan the docs directory
   if (project.type === 'starlight') {
+    const projectDocsPath = join(CONTENT_DIR, project.slug);
     try {
-      items = await generateStarlightItems(project);
-    } catch (error) {
-      console.warn(`  ⚠️  Could not generate nav items for ${project.slug}`);
+      await stat(projectDocsPath);
+    } catch {
       return null;
     }
+
+    const hasDocs = await directoryHasMarkdown(projectDocsPath);
+    if (!hasDocs) {
+      return null;
+    }
+
+    // autogenerate keeps nested pages in sync; collapsed: false keeps sections visible
+    // when viewing pages outside the project (e.g. Getting Started).
+    return {
+      label: project.name,
+      autogenerate: { directory: project.slug, collapsed: false },
+      collapsed: false,
+    };
   }
-  
-  // Add API reference link for OpenAPI projects
+
+  const items: SidebarItem[] = [];
+
   if (project.type === 'openapi') {
     items.push({
       label: 'API Reference',
       link: `/${project.slug}/api/`,
     });
   }
-  
-  // Add rustdoc link for Rust projects
+
   if (project.type === 'rust') {
     items.push({
       label: 'API Documentation',
       link: `/${project.slug}/api/`,
     });
   }
-  
+
   if (items.length === 0) {
     return null;
   }
-  
+
   return {
     label: project.name,
     items,
-    collapsed: true,
+    collapsed: false,
   };
 }
 
-/**
- * Generate nav items from Starlight markdown files
- */
-async function generateStarlightItems(project: Project): Promise<SidebarItem[]> {
-  const projectDocsPath = join(CONTENT_DIR, project.slug);
-  const items: SidebarItem[] = [];
-  
-  try {
-    const entries = await readdir(projectDocsPath, { withFileTypes: true });
-    
-    for (const entry of entries) {
-      if (entry.isFile() && (entry.name.endsWith('.md') || entry.name.endsWith('.mdx'))) {
-        const name = basename(entry.name, entry.name.endsWith('.mdx') ? '.mdx' : '.md');
-        const label = formatLabel(name);
-        
-        items.push({
-          label,
-          link: `/${project.slug}/${name}/`,
-        });
-      } else if (entry.isDirectory()) {
-        // Recursively handle subdirectories
-        const subItems = await generateSubdirectoryItems(project.slug, entry.name);
-        if (subItems.length > 0) {
-          items.push({
-            label: formatLabel(entry.name),
-            items: subItems,
-          });
-        }
-      }
+async function directoryHasMarkdown(dir: string): Promise<boolean> {
+  const entries = await readdir(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const path = join(dir, entry.name);
+    if (entry.isFile() && (entry.name.endsWith('.md') || entry.name.endsWith('.mdx'))) {
+      return true;
     }
-  } catch (error) {
-    console.warn(`Could not read directory: ${projectDocsPath}`);
-  }
-  
-  return items;
-}
-
-/**
- * Generate nav items for a subdirectory
- */
-async function generateSubdirectoryItems(projectSlug: string, subdir: string): Promise<SidebarItem[]> {
-  const subdirPath = join(CONTENT_DIR, projectSlug, subdir);
-  const items: SidebarItem[] = [];
-  
-  try {
-    const entries = await readdir(subdirPath, { withFileTypes: true });
-    
-    for (const entry of entries) {
-      if (entry.isFile() && (entry.name.endsWith('.md') || entry.name.endsWith('.mdx'))) {
-        const name = basename(entry.name, entry.name.endsWith('.mdx') ? '.mdx' : '.md');
-        const label = formatLabel(name);
-        
-        items.push({
-          label,
-          link: `/${projectSlug}/${subdir}/${name}/`,
-        });
-      }
+    if (entry.isDirectory() && (await directoryHasMarkdown(path))) {
+      return true;
     }
-  } catch (error) {
-    console.warn(`Could not read subdirectory: ${subdirPath}`);
   }
-  
-  return items;
-}
-
-/**
- * Format a filename into a readable label
- */
-function formatLabel(name: string): string {
-  return name
-    .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+  return false;
 }
 
 /**
@@ -180,6 +130,7 @@ async function writeAstroConfig(sidebar: (SidebarGroup | SidebarItem)[]): Promis
 import starlight from '@astrojs/starlight';
 
 export default defineConfig({
+  trailingSlash: 'always',
   integrations: [
     starlight({
       title: 'ScottyLabs Docs',

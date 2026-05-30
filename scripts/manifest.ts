@@ -57,6 +57,17 @@ export function isDocumentationHubProject(project: Pick<Project, 'slug' | 'repo'
 }
 
 /**
+ * Docs source directory for a project during build.
+ * The hub repo must never read from src/content/docs (Starlight shell).
+ */
+export function resolveProjectDocsDir(project: Pick<Project, 'slug' | 'repo' | 'docs_dir'>): string {
+  if (isDocumentationHubProject(project)) {
+    return 'docs';
+  }
+  return project.docs_dir || 'docs';
+}
+
+/**
  * Filesystem root for a project during build.
  * The hub repo is already checked out — read its docs/ in place, never clone it.
  */
