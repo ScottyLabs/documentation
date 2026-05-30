@@ -17,13 +17,17 @@ Each project has its own section in the sidebar with:
 - **API Docs**: Interactive API references (for projects with APIs)
 - **Rustdoc**: Generated documentation for Rust code
 
-### Contributing
+Use **search** (⌘K) or browse the sidebar to find what you need.
 
-To add a project to this hub, add `docs: true` flag in governance
+## For Contributors
 
-The build system will automatically:
+Repositories registered in [governance](https://codeberg.org/ScottyLabs/governance) are included in this hub by default. To exclude a repo, set `docs = false` in its team entry.
 
-- Clone your repository
-- Extract documentation
-- Generate API references (if applicable)
-- Build and deploy the unified site
+The build system automatically:
+
+- Clones your repository
+- Copies its `docs/` directory into this site
+- Generates API references (if applicable)
+- Builds and deploys to [docs.scottylabs.org](https://docs.scottylabs.org)
+
+See the [Documentation Hub](/documentation/) page for the full workflow.
