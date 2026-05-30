@@ -3,7 +3,7 @@
  * Handles parallel cloning of project repositories
  */
 
-import { mkdir } from 'node:fs/promises';
+import { mkdir, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { Project } from './manifest.ts';
 import { isDocumentationHubProject } from './manifest.ts';
@@ -25,50 +25,53 @@ export async function cloneAllRepos(projects: Project[]): Promise<void> {
   });
 
   console.log(`\n📦 Cloning ${reposToClone.length} repositories...\n`);
-  
-  // Ensure .repos directory exists
+
   await mkdir(REPOS_DIR, { recursive: true });
-  
-  // Clone repos in parallel
-  const clonePromises = reposToClone.map(project =>
-    cloneRepo(project).catch(error => {
+
+  const clonePromises = reposToClone.map((project) =>
+    ensureRepoCloned(project.repo, project.slug, project.name).catch((error) => {
       console.error(`❌ Failed to clone ${project.slug}:`, error.message);
       throw error;
     })
   );
-  
+
   await Promise.all(clonePromises);
   console.log('\n✅ All repositories cloned successfully\n');
 }
 
 /**
- * Clone a single repository
+ * Clone a repository if it is not already present under .repos/<slug>.
  */
-async function cloneRepo(project: Project): Promise<void> {
-  if (isDocumentationHubProject(project)) {
-    throw new Error(`Refusing to clone documentation hub repo (${project.slug})`);
+export async function ensureRepoCloned(
+  repoUrl: string,
+  slug: string,
+  displayName = slug
+): Promise<void> {
+  if (await isRepoCloned(slug)) {
+    console.log(`  ✓ ${displayName} (${slug}) already cloned`);
+    return;
   }
 
-  const repoPath = join(REPOS_DIR, project.slug);
-  
-  console.log(`  Cloning ${project.name} (${project.slug})...`);
-  
+  const repoPath = join(REPOS_DIR, slug);
+
+  console.log(`  Cloning ${displayName} (${slug})...`);
+
   const proc = Bun.spawn(
-    ['git', 'clone', '--depth', '1', '--single-branch', project.repo, repoPath],
+    ['git', 'clone', '--depth', '1', '--single-branch', repoUrl, repoPath],
     {
       stdout: 'pipe',
       stderr: 'pipe',
     }
   );
-  
+
   const exitCode = await proc.exited;
-  
+
   if (exitCode !== 0) {
     const stderr = await new Response(proc.stderr).text();
-    throw new Error(`Git clone failed for ${project.slug}: ${stderr}`);
+    throw new Error(`Git clone failed for ${slug}: ${stderr}`);
   }
-  
-  console.log(`  ✓ ${project.name} cloned`);
+
+  console.log(`  ✓ ${displayName} cloned`);
 }
 
 /**
@@ -82,9 +85,13 @@ export function getRepoPath(slug: string): string {
  * Check if a repository has already been cloned
  */
 export async function isRepoCloned(slug: string): Promise<boolean> {
-  const repoPath = getRepoPath(slug);
-  const dir = Bun.file(join(repoPath, '.git'));
-  return await dir.exists();
+  try {
+    const gitPath = join(getRepoPath(slug), '.git');
+    const info = await stat(gitPath);
+    return info.isDirectory();
+  } catch {
+    return false;
+  }
 }
 
 /**

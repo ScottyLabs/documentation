@@ -16,7 +16,7 @@ title: My Page
 # My Page
 ```
 
-Enable the repo in governance with `docs = true`. See [Documentation Hub](/documentation/) for the full workflow.
+Enable the repo in governance (included by default). Use `docs = false` to opt out. See [Documentation Hub](/documentation/) for the full workflow.
 
 ## Hub documentation
 

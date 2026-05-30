@@ -53,7 +53,7 @@ async function build() {
     if (allProjects.length === 0) {
       console.log('ℹ️  No projects found');
       console.log('   - Add projects to projects.toml, OR');
-      console.log('   - Add `docs: true` flag to projects in governance\n');
+      console.log('   - Register repositories in governance (docs included by default)\n');
       return;
     }
 

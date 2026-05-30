@@ -1,15 +1,16 @@
 /**
  * Governance integration utilities
- * Discovers projects with `docs: true` flag from governance repository
+ * Discovers repositories from governance (docs hub inclusion is on by default; opt out with docs = false)
  */
 
 import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { parse as parseToml } from 'smol-toml';
 import type { Project } from './manifest.ts';
+import { ensureRepoCloned } from './clone-repos.ts';
 
 const GOVERNANCE_REPO = 'https://codeberg.org/ScottyLabs/governance.git';
-const GOVERNANCE_DIR = '.repos/governance';
+const GOVERNANCE_SLUG = 'governance';
 const SCOTTYLABS_ORG = 'https://codeberg.org/scottylabs';
 
 interface GovernanceRepo {
@@ -88,6 +89,10 @@ function parseGovernanceTeamFile(content: string): GovernanceTeam | null {
   return isGovernanceTeam(parsed) ? parsed : null;
 }
 
+function repoIncludesDocs(repo: GovernanceRepo): boolean {
+  return repo.docs !== false;
+}
+
 function repoDisplayName(repo: GovernanceRepo): string {
   return repo.name
     .split('-')
@@ -100,22 +105,7 @@ function repoDisplayName(repo: GovernanceRepo): string {
  */
 export async function cloneGovernance(): Promise<void> {
   console.log('📋 Fetching governance data...');
-
-  const proc = Bun.spawn(
-    ['git', 'clone', '--depth', '1', '--single-branch', GOVERNANCE_REPO, GOVERNANCE_DIR],
-    {
-      stdout: 'pipe',
-      stderr: 'pipe',
-    }
-  );
-
-  const exitCode = await proc.exited;
-
-  if (exitCode !== 0) {
-    const stderr = await new Response(proc.stderr).text();
-    throw new Error(`Failed to clone governance repo: ${stderr}`);
-  }
-
+  await ensureRepoCloned(GOVERNANCE_REPO, GOVERNANCE_SLUG, 'governance');
   console.log('  ✓ Governance data fetched\n');
 }
 
@@ -124,14 +114,14 @@ function collectDocsReposFromTeam(teamData: GovernanceTeam): Project[] {
   const { team } = teamData;
 
   for (const repo of team.repos ?? []) {
-    if (repo.docs) {
+    if (repoIncludesDocs(repo)) {
       projects.push(convertTeamRepoToProject(repo, team.name));
     }
   }
 
   for (const govProject of team.projects ?? []) {
     for (const repo of govProject.repos ?? []) {
-      if (repo.docs) {
+      if (repoIncludesDocs(repo)) {
         projects.push(convertRepoToProject(repo, govProject));
       }
     }
@@ -146,7 +136,7 @@ function collectDocsReposFromTeam(teamData: GovernanceTeam): Project[] {
 export async function discoverProjectsFromGovernance(): Promise<Project[]> {
   console.log('🔍 Discovering projects from governance...');
 
-  const teamsDir = join(GOVERNANCE_DIR, 'data', 'teams');
+  const teamsDir = join('.repos', GOVERNANCE_SLUG, 'data', 'teams');
   const projects: Project[] = [];
 
   try {
@@ -180,7 +170,7 @@ export async function discoverProjectsFromGovernance(): Promise<Project[]> {
     return [];
   }
 
-  console.log(`  Found ${projects.length} projects with docs flag\n`);
+  console.log(`  Found ${projects.length} repositories for documentation\n`);
   return projects;
 }
 
