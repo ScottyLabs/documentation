@@ -4,8 +4,6 @@ project: "infrastructure"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/infrastructure"
 ---
-# Preparing for Setup
-
 CampusCloud VMs are managed through vSphere, which is accessed through [Citrix Workspace](https://apps.cmu.edu/). From here, you can select `Campus Cloud vSphere Client`. Install Citrix Viewer when prompted.
 
 <img src="./assets/citrix-workspace.png" alt="Citrix workspace" height="300" />

@@ -4,8 +4,6 @@ project: "tartan-vote"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/tartan-vote"
 ---
-# Proxy Voting System Implementation - Complete Summary
-
 ## Overview
 
 The voting application now supports a sophisticated proxy voting system where users can declare themselves as "senator" elected representatives and optionally proxy vote for other members. The system enforces participation rules server-side to ensure correct vote instance counts.

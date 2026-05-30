@@ -4,8 +4,6 @@ project: "courses"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/courses"
 ---
-# Text search
-
 Each course is indexed across five fields with distinct BM25 weights:
 
 | Field              | Weight | Source                                                                          |

@@ -4,8 +4,6 @@ project: "tartan-vote"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/tartan-vote"
 ---
-# Extensive Guide to Running Tartan Vote
-
 ## Prerequisites
 
 This project uses [devenv](https://devenv.sh/getting-started/) to provide Bun, Cargo, PostgreSQL, and all other development dependencies. Follow the devenv installation instructions.

@@ -4,8 +4,6 @@ project: "tartan-vote"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/tartan-vote"
 ---
-# Contributing
-
 Thanks for your interest in contributing to Tartan Vote!
 
 Before contributing to this repository, please discuss the change you wish to make via issue on this repository, email to one of the codeowners, or on the ScottyLabs [discord](https://go.scottylabs.org/discord).

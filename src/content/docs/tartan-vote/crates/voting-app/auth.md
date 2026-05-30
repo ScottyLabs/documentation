@@ -4,8 +4,6 @@ project: "tartan-vote"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/tartan-vote"
 ---
-# Auth
-
 The backend now integrates with Better Auth via cookie-based session lookups instead of `axum-oidc` middleware.
 
 ## Overview

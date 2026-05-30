@@ -4,8 +4,6 @@ project: "infrastructure"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/infrastructure"
 ---
-# Post-Installation Setup
-
 Exit VMWare Remote Console, and SSH in with your user. Since the configuration has been applied, you will no longer be able to SSH in as root, and you must use your Andrew ID/Kerberos instead:
 
 ```bash

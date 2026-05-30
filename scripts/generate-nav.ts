@@ -75,7 +75,7 @@ async function generateProjectSection(project: Project): Promise<SidebarGroup | 
     // autogenerate keeps nested pages in sync; collapsed: false keeps sections visible
     // when viewing pages outside the project (e.g. Getting Started).
     return {
-      label: project.name,
+      label: await sidebarGroupLabel(project),
       autogenerate: { directory: project.slug, collapsed: false },
       collapsed: false,
     };
@@ -122,6 +122,47 @@ async function directoryHasMarkdown(dir: string): Promise<boolean> {
   return false;
 }
 
+function titleFromFrontmatter(content: string): string | undefined {
+  const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n/);
+  if (!frontmatterMatch) {
+    return undefined;
+  }
+
+  const match = frontmatterMatch[1].match(/^title:\s*(.+)$/m);
+  if (!match) {
+    return undefined;
+  }
+
+  const raw = match[1].trim();
+  if (raw.startsWith('"') || raw.startsWith("'")) {
+    try {
+      return JSON.parse(raw.replace(/^'/, '"').replace(/'$/, '"'));
+    } catch {
+      return raw.replace(/^['"]|['"]$/g, '');
+    }
+  }
+
+  return raw;
+}
+
+/** Use the index page title as the sidebar group label when one exists. */
+async function sidebarGroupLabel(project: Project): Promise<string> {
+  for (const filename of ['index.md', 'index.mdx']) {
+    const indexPath = join(CONTENT_DIR, project.slug, filename);
+    try {
+      const content = await Bun.file(indexPath).text();
+      const title = titleFromFrontmatter(content);
+      if (title) {
+        return title;
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  return project.name;
+}
+
 /**
  * Write the updated Astro config with sidebar
  */
@@ -139,7 +180,6 @@ export default defineConfig({
         github: 'https://github.com/ScottyLabs',
       },
       components: {
-        Page: './src/components/Page.astro',
         Pagination: './src/components/Pagination.astro',
         Sidebar: './src/components/Sidebar.astro',
       },

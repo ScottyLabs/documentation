@@ -4,8 +4,6 @@ project: "infrastructure"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/infrastructure"
 ---
-# OpenBao Secrets
-
 OpenBao provides self-service secret management for project teams. Unlike agenix (which encrypts secrets in git), OpenBao stores secrets centrally and delivers them to hosts at runtime.
 
 ## When to Use What

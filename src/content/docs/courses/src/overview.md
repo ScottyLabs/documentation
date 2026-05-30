@@ -4,8 +4,6 @@ project: "courses"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/courses"
 ---
-# Overview
-
 The CMU Courses project has three layers:
 
 1. `courses-scraper` pulls course information, sections, program audits, and syllabi from Stellic and Canvas. Output lands under `exported/` as JSON files keyed by course code, program, and term.

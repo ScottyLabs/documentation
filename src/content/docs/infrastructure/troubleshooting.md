@@ -4,8 +4,6 @@ project: "infrastructure"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/infrastructure"
 ---
-# Troubleshooting
-
 ## comin not deploying after a force push
 
 If someone force pushes to the repository, comin's cached repo and state can get out of sync with the remote. Symptoms include comin fetching successfully but never triggering a build.

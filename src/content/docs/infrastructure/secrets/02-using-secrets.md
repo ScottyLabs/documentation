@@ -4,8 +4,6 @@ project: "infrastructure"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/infrastructure"
 ---
-# Using Secrets
-
 In configuration files for services managed by NixOS, first define the secret:
 
 ```nix

@@ -4,8 +4,6 @@ project: "tartan-vote"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/tartan-vote"
 ---
-# Proxy Voting System - Testing Guide
-
 ## Pre-Testing Checklist
 
 - [ ] Backend compiled successfully: `cargo check` passes

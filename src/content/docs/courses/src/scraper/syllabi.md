@@ -4,8 +4,6 @@ project: "courses"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/courses"
 ---
-# Syllabi (Canvas)
-
 CMU's Canvas instance hosts a "Syllabus Registry" course that aggregates instructor-uploaded syllabi across most departments and recent terms.
 
 ## Source

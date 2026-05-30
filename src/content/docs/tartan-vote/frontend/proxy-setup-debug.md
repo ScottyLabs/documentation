@@ -4,8 +4,6 @@ project: "tartan-vote"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/tartan-vote"
 ---
-# ProxySetup Endpoint - Debugging Guide
-
 ## What I've Updated
 
 I've enhanced the `ProxySetup.svelte` component with comprehensive logging and debugging to help identify why the backend request isn't working correctly.

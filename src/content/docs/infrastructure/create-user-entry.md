@@ -4,8 +4,6 @@ project: "infrastructure"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/infrastructure"
 ---
-# Create a User Entry
-
 To create a user entry, add a new attribute to the `users` set in [users.nix](https://codeberg.org/scottylabs/infrastructure/src/branch/main/users.nix). The attribute name should be your Andrew ID. Each user entry should include the following fields:
 
 - `git.name`: Your full name for Git commits.

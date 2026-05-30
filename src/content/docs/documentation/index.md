@@ -15,7 +15,7 @@ This site aggregates documentation from ScottyLabs projects. Repositories are in
 2. CI clones each repo and copies its `docs/` directory into this site
 3. The built site is published to [docs.scottylabs.org](https://docs.scottylabs.org)
 
-This repository's own pages live here under **Documentation** — separate from the Starlight site shell in `src/content/docs/`.
+This repository's own pages live here under **Documentation Hub** — separate from the Starlight site shell in `src/content/docs/`.
 
 ## Adding your project
 

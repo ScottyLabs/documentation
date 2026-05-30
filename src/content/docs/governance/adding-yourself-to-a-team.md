@@ -4,8 +4,6 @@ project: "governance"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/governance"
 ---
-# Adding yourself to a team
-
 ## Before you open a PR
 
 1. **[Link your identities in Keycloak first](https://idp.scottylabs.org/realms/scottylabs/account/account-security/linked-accounts)**, and remember to check the second page.

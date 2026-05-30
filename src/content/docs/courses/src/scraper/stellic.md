@@ -4,8 +4,6 @@ project: "courses"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/courses"
 ---
-# Stellic
-
 CMU's Stellic deployment lives at `academicaudit.andrew.cmu.edu`. None of this API is publicly documented; the catalog below is reverse-engineered from the live JS bundle and verified by direct request.
 
 ## Auth

@@ -4,8 +4,6 @@ project: "courses"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/courses"
 ---
-# Programs
-
 The Stellic catalog exposes 2129 programs through `GET /catalog/getprograms/`. This doc covers the type vocabulary, the two ID spaces a program lives in, and the shape of the requirement tree.
 
 ## Catalog vs audit-version IDs

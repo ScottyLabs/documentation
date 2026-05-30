@@ -4,8 +4,6 @@ project: "tartan-vote"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/tartan-vote"
 ---
-# JSON Information
-
 - [vote.data](#votedata)
 - [event.data](#eventdata)
 - [organization.data](#organizationdata)

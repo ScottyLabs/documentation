@@ -4,8 +4,6 @@ project: "tartan-vote"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/tartan-vote"
 ---
-# Generating migrations
-
 Using sea-orm, we follow the standard migration-first approach. We recommend using sea-orm-cli to generate migrations and entities.
 
 ## Migrations

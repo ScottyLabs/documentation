@@ -5,8 +5,6 @@ project: documentation
 repo: https://codeberg.org/ScottyLabs/documentation
 ---
 
-# Getting Started
-
 Welcome! This documentation hub aggregates documentation from multiple ScottyLabs repositories.
 
 ## For Users

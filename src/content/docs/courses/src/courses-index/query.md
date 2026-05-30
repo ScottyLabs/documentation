@@ -4,8 +4,6 @@ project: "courses"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/courses"
 ---
-# Query engine
-
 Queries flow through `Searcher::query`. A `Searcher` owns reusable scratch buffers (a per-doc `f32` accumulator with epoch-based dirty tracking, plus a `Vec<u32>` of touched doc ids), so successive queries do not re-allocate or zero 9k+ entries.
 
 ## Query shape

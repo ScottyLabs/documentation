@@ -4,8 +4,6 @@ project: "courses"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/courses"
 ---
-# Facets and numeric filters
-
 The index splits filters into two shapes by data type. Categorical filters live in `FacetIndex`; numeric range filters live in `NumericIndex`.
 
 ## Categorical facets

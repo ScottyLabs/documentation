@@ -11,7 +11,6 @@ export default defineConfig({
         github: 'https://github.com/ScottyLabs',
       },
       components: {
-        Page: './src/components/Page.astro',
         Pagination: './src/components/Pagination.astro',
         Sidebar: './src/components/Sidebar.astro',
       },
@@ -55,7 +54,7 @@ export default defineConfig({
                 collapsed: false
         },
         {
-                label: "Documentation",
+                label: "Documentation Hub",
                 autogenerate: {
                         directory: "documentation",
                         collapsed: false

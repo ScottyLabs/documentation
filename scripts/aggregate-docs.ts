@@ -148,6 +148,21 @@ function deriveTitle(body: string, filename: string): string {
   return formatLabel(base);
 }
 
+/** Remove a leading H1 when it duplicates the page title (Starlight renders title separately). */
+function stripLeadingDuplicateH1(body: string, title: string): string {
+  const match = body.match(/^#\s+(.+?)\s*(?:\n|$)/);
+  if (!match) {
+    return body;
+  }
+
+  const heading = match[1].replace(/\s*\{#.*\}$/, '').trim();
+  if (heading.toLowerCase() !== title.toLowerCase()) {
+    return body;
+  }
+
+  return body.slice(match[0].length).replace(/^\n+/, '');
+}
+
 function stripFrontmatterKeys(frontmatter: string, keys: string[]): string {
   const pattern = new RegExp(`^(${keys.join('|')}):.*(?:\\n|$)`, 'gm');
   return frontmatter.replace(pattern, '').trim();
@@ -212,8 +227,9 @@ async function processMarkdownFile(
   const title =
     titleFromFrontmatter(existingFrontmatter) ?? deriveTitle(body, basename(sourcePath));
   const frontmatter = buildFrontmatter(existingFrontmatter, title, project);
+  const trimmedBody = stripLeadingDuplicateH1(body, title);
 
-  await Bun.write(targetPath, `---\n${frontmatter}\n---\n${body}`);
+  await Bun.write(targetPath, `---\n${frontmatter}\n---\n${trimmedBody}`);
 }
 
 /**

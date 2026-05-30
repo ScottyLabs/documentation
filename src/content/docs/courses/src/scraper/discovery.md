@@ -4,8 +4,6 @@ project: "courses"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/courses"
 ---
-# Course discovery
-
 How the scraper builds the course list and the per-course tasks it sends to Stellic.
 
 ## Sources

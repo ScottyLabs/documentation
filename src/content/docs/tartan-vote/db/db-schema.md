@@ -4,8 +4,6 @@ project: "tartan-vote"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/tartan-vote"
 ---
-# Schema Information
-
 - [Users](#users)
 - [Organizations](#organizations)
 - [Organization Members](#organization-members)

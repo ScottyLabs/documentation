@@ -4,8 +4,6 @@ project: "courses"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/courses"
 ---
-# Catalog binary format
-
 The catalog file (`catalog.bin`) is a region-based bincode encoding wrapped in an outer gzip layer. The browser unwraps the gzip with the native `DecompressionStream` API; native callers use `flate2`. Region bodies inside the wrap are uncompressed, so wasm reads them without an additional decode pass.
 
 ## File layout

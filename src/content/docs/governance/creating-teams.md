@@ -4,8 +4,6 @@ project: "governance"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/governance"
 ---
-# Creating a team
-
 Governance stores teams as `data/teams/<slug>.toml`. Reference existing teams for samples, and see [schemas/team.schema.json](https://codeberg.org/scottylabs/governance/src/branch/main/schemas/team.schema.json) for the complete specification.
 
 After merge, the `Apply` step will automatically configure everything specified. If `Apply` fails, it's likely because you tried to declare pre-existing resources. Ask someone in DevOps to manually import them into governance for you.

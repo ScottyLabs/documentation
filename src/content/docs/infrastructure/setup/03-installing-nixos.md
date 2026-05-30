@@ -4,8 +4,6 @@ project: "infrastructure"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/infrastructure"
 ---
-# Installing NixOS
-
 Before continuing, you should first have a local NixOS installation ISO. Download the latest 64-bit Intel/AMD *Minimal ISO* from the [NixOS download page](https://nixos.org/download/#nixos-iso).
 
 Do not power on the VM yet. First, you need to mount the NixOS installation ISO. Press "Launch Remote Console":

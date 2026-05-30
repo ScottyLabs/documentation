@@ -4,8 +4,6 @@ project: "infrastructure"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/infrastructure"
 ---
-# Creating Secrets
-
 `agenix` relies on your SSH public key, so you must have a completed user entry in [users.nix](https://codeberg.org/scottylabs/infrastructure/src/branch/main/users.nix).
 
 Once that is done, define the secret in [secrets.nix](https://codeberg.org/scottylabs/infrastructure/src/branch/main/secrets.nix). For example, to add a secret named `secret1` on `prod-02`, add this line:

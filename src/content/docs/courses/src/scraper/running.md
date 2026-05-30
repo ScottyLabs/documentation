@@ -4,8 +4,6 @@ project: "courses"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/courses"
 ---
-# Running the scraper
-
 ## CLI
 
 | Flag              | Env             | Default                    | Purpose                                                                                                                                                      |

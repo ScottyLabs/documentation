@@ -4,8 +4,6 @@ project: "infrastructure"
 projectType: "starlight"
 repo: "https://codeberg.org/scottylabs/infrastructure"
 ---
-# Purchasing a VM
-
 We buy CampusCloud VMs from CMU. To request a new VM:
 
 1. Visit [this form](https://cmu.service-now.com/go/CampusCloudNewServer).
