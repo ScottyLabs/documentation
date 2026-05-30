@@ -7,6 +7,7 @@ export default defineConfig({
     starlight({
       title: 'ScottyLabs Docs',
       description: 'Unified documentation for ScottyLabs projects',
+      favicon: '/favicon.ico',
       social: {
         github: 'https://github.com/ScottyLabs',
       },
