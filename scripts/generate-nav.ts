@@ -138,6 +138,9 @@ export default defineConfig({
       social: {
         github: 'https://github.com/ScottyLabs',
       },
+      components: {
+        Pagination: './src/components/Pagination.astro',
+      },
       sidebar: ${JSON.stringify(sidebar, null, 8).replace(/"([^"]+)":/g, '$1:')},
       customCss: [
         './src/styles/scalar-theme.css',

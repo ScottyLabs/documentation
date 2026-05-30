@@ -10,6 +10,9 @@ export default defineConfig({
       social: {
         github: 'https://github.com/ScottyLabs',
       },
+      components: {
+        Pagination: './src/components/Pagination.astro',
+      },
       sidebar: [
         {
           label: 'Welcome',

@@ -136,13 +136,14 @@ function buildFrontmatter(
   title: string,
   project: Project
 ): string {
-  const preserved = stripFrontmatterKeys(existingFrontmatter, ['title', 'project', 'projectType']);
+  const preserved = stripFrontmatterKeys(existingFrontmatter, ['title', 'project', 'projectType', 'repo']);
 
   return [
     `title: ${JSON.stringify(title)}`,
     preserved,
     `project: ${JSON.stringify(project.slug)}`,
     `projectType: ${JSON.stringify(project.type)}`,
+    `repo: ${JSON.stringify(project.repo)}`,
   ]
     .filter(Boolean)
     .join('\n');

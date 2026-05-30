@@ -7,6 +7,7 @@ export const collections = {
       extend: z.object({
         project: z.string().optional(),
         projectType: z.enum(['starlight', 'rust', 'openapi']).optional(),
+        repo: z.string().url().optional(),
       }),
     }),
   }),
