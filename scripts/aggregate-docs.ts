@@ -6,7 +6,7 @@
 import { mkdir, cp, readdir, stat } from 'node:fs/promises';
 import { join, relative, basename } from 'node:path';
 import type { Project } from './manifest.ts';
-import { getRepoPath } from './clone-repos.ts';
+import { resolveProjectRepoRoot } from './manifest.ts';
 
 const CONTENT_DIR = 'src/content/docs';
 
@@ -31,7 +31,7 @@ export async function aggregateStarlightDocs(projects: Project[]): Promise<void>
 async function aggregateProjectDocs(project: Project): Promise<void> {
   console.log(`  Processing ${project.name}...`);
   
-  const repoPath = getRepoPath(project.slug);
+  const repoPath = resolveProjectRepoRoot(project);
   const sourceDocs = join(repoPath, project.docs_dir);
   const targetDocs = join(CONTENT_DIR, project.slug);
   

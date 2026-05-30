@@ -3,7 +3,7 @@
  * Coordinates all build steps for the documentation hub
  */
 
-import { parseManifest } from './manifest.ts';
+import { parseManifest, externalProjects, isDocumentationHubProject } from './manifest.ts';
 import { cloneGovernance, discoverProjectsFromGovernance, mergeProjects } from './governance.ts';
 import { cloneAllRepos, cleanRepos } from './clone-repos.ts';
 import { aggregateStarlightDocs, cleanDocs } from './aggregate-docs.ts';
@@ -38,30 +38,39 @@ async function build() {
     }
     
     // Merge projects (manual overrides governance)
-    const projects = mergeProjects(governanceProjects, manifestProjects);
-    console.log(`📦 Total projects to build: ${projects.length}\n`);
-    
-    if (projects.length === 0) {
+    const allProjects = mergeProjects(governanceProjects, manifestProjects);
+    const hubProjects = allProjects.filter(isDocumentationHubProject);
+    const remoteProjects = externalProjects(allProjects);
+
+    if (hubProjects.length > 0) {
+      console.log(
+        `   Including ${hubProjects.length} hub doc source(s) from local docs/ (no self-clone)\n`
+      );
+    }
+
+    console.log(`📦 Total projects to build: ${allProjects.length}\n`);
+
+    if (allProjects.length === 0) {
       console.log('ℹ️  No projects found');
       console.log('   - Add projects to projects.toml, OR');
       console.log('   - Add `docs: true` flag to projects in governance\n');
       return;
     }
-    
-    // Clone repositories
-    await cloneAllRepos(projects);
-    
-    // Aggregate Starlight documentation
-    await aggregateStarlightDocs(projects);
-    
+
+    // Clone external repositories only
+    await cloneAllRepos(allProjects);
+
+    // Aggregate Starlight documentation (hub uses ./docs, not src/content/docs)
+    await aggregateStarlightDocs(allProjects);
+
     // Process OpenAPI projects
-    await processOpenApiProjects(projects);
-    
+    await processOpenApiProjects(remoteProjects);
+
     // Build Rust documentation
-    await buildRustDocs(projects);
-    
+    await buildRustDocs(remoteProjects);
+
     // Generate navigation
-    await generateNavigation(projects);
+    await generateNavigation(allProjects);
     
     const duration = ((Date.now() - startTime) / 1000).toFixed(2);
     console.log(`✨ Build completed in ${duration}s\n`);

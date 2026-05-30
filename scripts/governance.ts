@@ -36,6 +36,7 @@ interface GovernanceTeam {
     name: string;
     slug: string;
     leads?: string[];
+    repos?: GovernanceRepo[];
     projects?: GovernanceProject[];
     channels?: any[];
   };
@@ -69,6 +70,11 @@ function isGovernanceTeam(value: unknown): value is GovernanceTeam {
   if (typeof team.name !== 'string' || typeof team.slug !== 'string') {
     return false;
   }
+  if (team.repos !== undefined) {
+    if (!Array.isArray(team.repos) || !team.repos.every(isGovernanceRepo)) {
+      return false;
+    }
+  }
   if (team.projects !== undefined) {
     if (!Array.isArray(team.projects) || !team.projects.every(isGovernanceProject)) {
       return false;
@@ -82,12 +88,19 @@ function parseGovernanceTeamFile(content: string): GovernanceTeam | null {
   return isGovernanceTeam(parsed) ? parsed : null;
 }
 
+function repoDisplayName(repo: GovernanceRepo): string {
+  return repo.name
+    .split('-')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
 /**
  * Clone governance repository
  */
 export async function cloneGovernance(): Promise<void> {
   console.log('📋 Fetching governance data...');
-  
+
   const proc = Bun.spawn(
     ['git', 'clone', '--depth', '1', '--single-branch', GOVERNANCE_REPO, GOVERNANCE_DIR],
     {
@@ -95,15 +108,36 @@ export async function cloneGovernance(): Promise<void> {
       stderr: 'pipe',
     }
   );
-  
+
   const exitCode = await proc.exited;
-  
+
   if (exitCode !== 0) {
     const stderr = await new Response(proc.stderr).text();
     throw new Error(`Failed to clone governance repo: ${stderr}`);
   }
-  
+
   console.log('  ✓ Governance data fetched\n');
+}
+
+function collectDocsReposFromTeam(teamData: GovernanceTeam): Project[] {
+  const projects: Project[] = [];
+  const { team } = teamData;
+
+  for (const repo of team.repos ?? []) {
+    if (repo.docs) {
+      projects.push(convertTeamRepoToProject(repo, team.name));
+    }
+  }
+
+  for (const govProject of team.projects ?? []) {
+    for (const repo of govProject.repos ?? []) {
+      if (repo.docs) {
+        projects.push(convertRepoToProject(repo, govProject));
+      }
+    }
+  }
+
+  return projects;
 }
 
 /**
@@ -111,68 +145,71 @@ export async function cloneGovernance(): Promise<void> {
  */
 export async function discoverProjectsFromGovernance(): Promise<Project[]> {
   console.log('🔍 Discovering projects from governance...');
-  
-  // Look in the data/ directory for team definitions
-  const dataDir = join(GOVERNANCE_DIR, 'data');
+
+  const teamsDir = join(GOVERNANCE_DIR, 'data', 'teams');
   const projects: Project[] = [];
-  
+
   try {
-    const files = await readdir(dataDir);
-    
+    const files = await readdir(teamsDir);
+
     for (const file of files) {
       if (!file.endsWith('.toml')) {
         continue;
       }
-      
-      const filePath = join(dataDir, file);
+
+      const filePath = join(teamsDir, file);
       const content = await readFile(filePath, 'utf-8');
-      
+
       try {
         const teamData = parseGovernanceTeamFile(content);
-        
-        if (!teamData?.team.projects) {
+        if (!teamData) {
           continue;
         }
-        
-        // Iterate through projects in this team
-        for (const govProject of teamData.team.projects) {
-          if (!govProject.repos) {
-            continue;
-          }
-          
-          // Iterate through repos in this project
-          for (const repo of govProject.repos) {
-            if (repo.docs) {
-              const project = convertRepoToProject(repo, govProject);
-              projects.push(project);
-              console.log(`  ✓ Found: ${project.name} (${govProject.name})`);
-            }
-          }
+
+        for (const project of collectDocsReposFromTeam(teamData)) {
+          projects.push(project);
+          console.log(`  ✓ Found: ${project.name} (${teamData.team.name})`);
         }
       } catch (error) {
         console.warn(`  ⚠️  Could not parse ${file}:`, error instanceof Error ? error.message : String(error));
       }
     }
   } catch (error) {
-    console.warn('  ⚠️  Could not read governance data directory');
+    console.warn('  ⚠️  Could not read governance teams directory');
     console.warn('  Continuing with manually configured projects only');
     return [];
   }
-  
+
   console.log(`  Found ${projects.length} projects with docs flag\n`);
   return projects;
 }
 
 /**
- * Convert governance repo to documentation project
+ * Convert a team-level governance repo to a documentation project
+ */
+function convertTeamRepoToProject(repo: GovernanceRepo, teamName: string): Project {
+  const slug = repo.name;
+  const repoUrl = `${SCOTTYLABS_ORG}/${repo.name}`;
+
+  return {
+    slug,
+    name: repoDisplayName(repo),
+    repo: repoUrl,
+    type: repo.docs_type || 'starlight',
+    docs_dir: repo.docs_dir || 'docs',
+    description: repo.description || `${teamName} documentation`,
+    openapi_spec: repo.openapi_spec,
+    export_command: repo.export_command,
+  };
+}
+
+/**
+ * Convert governance project repo to documentation project
  */
 function convertRepoToProject(repo: GovernanceRepo, govProject: GovernanceProject): Project {
-  // Use repo name as slug (it should already be kebab-case)
   const slug = repo.name;
-  
-  // Construct repository URL
   const repoUrl = `${SCOTTYLABS_ORG}/${repo.name}`;
-  
+
   return {
     slug,
     name: govProject.name,
@@ -190,16 +227,14 @@ function convertRepoToProject(repo: GovernanceRepo, govProject: GovernanceProjec
  */
 export function mergeProjects(governanceProjects: Project[], manifestProjects: Project[]): Project[] {
   const merged = new Map<string, Project>();
-  
-  // Add all governance projects
+
   for (const project of governanceProjects) {
     merged.set(project.slug, project);
   }
-  
-  // Add/override with manual projects
+
   for (const project of manifestProjects) {
     merged.set(project.slug, project);
   }
-  
+
   return Array.from(merged.values());
 }

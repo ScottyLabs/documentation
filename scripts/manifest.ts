@@ -1,9 +1,9 @@
-/**
- * Project manifest types and parser
- * Defines the structure of projects.toml and provides parsing utilities
- */
+import { join } from 'node:path';
 
 export type ProjectType = 'starlight' | 'rust' | 'openapi';
+
+/** Slug/repo name of this repository — must never be cloned during build. */
+export const DOCUMENTATION_HUB_SLUG = 'documentation';
 
 export interface Project {
   slug: string;
@@ -34,12 +34,44 @@ export async function parseManifest(path: string): Promise<Project[]> {
     return [];
   }
   
-  // Validate each project
-  for (const project of manifest.project) {
+  return manifest.project.filter((project) => {
     validateProject(project);
+    return true;
+  });
+}
+
+/**
+ * Returns true when a project refers to this documentation hub repo.
+ */
+export function isDocumentationHubProject(project: Pick<Project, 'slug' | 'repo'>): boolean {
+  const slug = project.slug.toLowerCase();
+  if (slug === DOCUMENTATION_HUB_SLUG) {
+    return true;
   }
-  
-  return manifest.project;
+
+  const repo = project.repo.toLowerCase().replace(/\.git$/, '');
+  return (
+    repo.endsWith('/documentation') ||
+    repo.endsWith('/scottylabs/documentation')
+  );
+}
+
+/**
+ * Filesystem root for a project during build.
+ * The hub repo is already checked out — read its docs/ in place, never clone it.
+ */
+export function resolveProjectRepoRoot(project: Pick<Project, 'slug' | 'repo'>): string {
+  if (isDocumentationHubProject(project)) {
+    return '.';
+  }
+  return join('.repos', project.slug);
+}
+
+/**
+ * Projects that live in external repositories (excludes this hub).
+ */
+export function externalProjects(projects: Project[]): Project[] {
+  return projects.filter((project) => !isDocumentationHubProject(project));
 }
 
 /**
