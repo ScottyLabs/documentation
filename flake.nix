@@ -82,9 +82,11 @@
 
             export AWS_ACCESS_KEY_ID="$GARAGE_ACCESS_KEY"
             export AWS_SECRET_ACCESS_KEY="$GARAGE_SECRET_KEY"
-            export AWS_ENDPOINT_URL="$GARAGE_ENDPOINT"
+            export AWS_DEFAULT_REGION=us-east-1
 
             ${pkgs.awscli2}/bin/aws s3 sync "$SITE/" "s3://$GARAGE_BUCKET/" \
+              --endpoint-url "$GARAGE_ENDPOINT" \
+              --region us-east-1 \
               --delete \
               --cache-control "public, max-age=3600"
 
