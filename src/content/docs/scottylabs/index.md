@@ -1,0 +1,14 @@
+---
+title: "ScottyLabs"
+project: "scottylabs"
+projectType: "starlight"
+repo: "https://codeberg.org/scottylabs/documentation"
+---
+
+Welcome to ScottyLabs documentation! This is the central hub for organization-wide guides and processes.
+
+For a less technical introduction to ScottyLabs, check out the [ScottyLabs website](https://scottylabs.org/).
+
+## Do you have any questions?
+
+Join and ask on [Slack](/scottylabs/communication/)! There is also a Slack Bot (@bark) who can answer your questions!

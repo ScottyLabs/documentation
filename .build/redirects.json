@@ -14,5 +14,9 @@
   {
     "from": "documentation/index",
     "to": "documentation"
+  },
+  {
+    "from": "scottylabs/index",
+    "to": "scottylabs"
   }
 ]

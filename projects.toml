@@ -8,15 +8,14 @@
 # 2. Manual overrides for projects not in governance
 # 3. External documentation sources
 
-# Central ScottyLabs organization documentation
-# Uncomment when the scottylabs-docs repository is created:
-# [[project]]
-# slug = "scottylabs"
-# name = "ScottyLabs"
-# repo = "https://codeberg.org/scottylabs/scottylabs-docs"
-# type = "starlight"
-# docs_dir = "docs"
-# description = "Organization-wide guides, processes, and resources"
+# Central ScottyLabs organization documentation (migrated from GitHub wiki)
+[[project]]
+slug = "scottylabs"
+name = "ScottyLabs"
+repo = "https://codeberg.org/scottylabs/documentation"
+type = "starlight"
+docs_dir = "org-docs/scottylabs"
+description = "Organization-wide guides, processes, and resources"
 
 # Projects with `docs: true` in governance are auto-discovered
 # No need to add them here unless you want to override defaults

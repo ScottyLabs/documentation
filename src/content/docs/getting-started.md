@@ -15,6 +15,8 @@ Each project has its own section in the sidebar with:
 - **API Docs**: Interactive API references (for projects with APIs)
 - **Rustdoc**: Generated documentation for Rust code
 
+Start with [ScottyLabs](/scottylabs/) for organization-wide guides on contributing, communication, and credentials.
+
 Use **search** (⌘K) or browse the sidebar to find what you need.
 
 ## For Contributors

@@ -30,6 +30,14 @@ export default defineConfig({
                 ]
         },
         {
+                label: "ScottyLabs",
+                autogenerate: {
+                        directory: "scottylabs",
+                        collapsed: false
+                },
+                collapsed: false
+        },
+        {
                 label: "Tartan Vote",
                 autogenerate: {
                         directory: "tartan-vote",

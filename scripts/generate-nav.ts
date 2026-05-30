@@ -41,8 +41,14 @@ export async function generateNavigation(projects: Project[]): Promise<void> {
     },
   ];
   
-  // Add project sections
-  for (const project of projects) {
+  // Add project sections (ScottyLabs org docs first, then everything else)
+  const sortedProjects = [...projects].sort((a, b) => {
+    if (a.slug === 'scottylabs') return -1;
+    if (b.slug === 'scottylabs') return 1;
+    return 0;
+  });
+
+  for (const project of sortedProjects) {
     const projectSection = await generateProjectSection(project);
     if (projectSection) {
       sidebar.push(projectSection);

@@ -5,6 +5,9 @@ export type ProjectType = 'starlight' | 'rust' | 'openapi';
 /** Slug/repo name of this repository — must never be cloned during build. */
 export const DOCUMENTATION_HUB_SLUG = 'documentation';
 
+/** Hub-local doc sources that live in this repo (not cloned from .repos/). */
+const HUB_LOCAL_DOC_SLUGS = new Set([DOCUMENTATION_HUB_SLUG, 'scottylabs']);
+
 export interface Project {
   slug: string;
   name: string;
@@ -43,17 +46,21 @@ export async function parseManifest(path: string): Promise<Project[]> {
 /**
  * Returns true when a project refers to this documentation hub repo.
  */
+function isDocumentationHubRepo(repo: string): boolean {
+  const normalized = repo.toLowerCase().replace(/\.git$/, '');
+  return (
+    normalized.endsWith('/documentation') ||
+    normalized.endsWith('/scottylabs/documentation')
+  );
+}
+
 export function isDocumentationHubProject(project: Pick<Project, 'slug' | 'repo'>): boolean {
   const slug = project.slug.toLowerCase();
-  if (slug === DOCUMENTATION_HUB_SLUG) {
-    return true;
+  if (HUB_LOCAL_DOC_SLUGS.has(slug)) {
+    return isDocumentationHubRepo(project.repo);
   }
 
-  const repo = project.repo.toLowerCase().replace(/\.git$/, '');
-  return (
-    repo.endsWith('/documentation') ||
-    repo.endsWith('/scottylabs/documentation')
-  );
+  return false;
 }
 
 /**
@@ -62,6 +69,9 @@ export function isDocumentationHubProject(project: Pick<Project, 'slug' | 'repo'
  */
 export function resolveProjectDocsDir(project: Pick<Project, 'slug' | 'repo' | 'docs_dir'>): string {
   if (isDocumentationHubProject(project)) {
+    if (project.slug.toLowerCase() === 'scottylabs') {
+      return 'org-docs/scottylabs';
+    }
     return 'docs';
   }
   return project.docs_dir || 'docs';
