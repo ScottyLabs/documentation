@@ -3,7 +3,7 @@
  * Handles parallel cloning of project repositories
  */
 
-import { mkdir, stat } from 'node:fs/promises';
+import { mkdir, rm, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { Project } from './manifest.ts';
 import { isDocumentationHubProject } from './manifest.ts';
@@ -54,6 +54,14 @@ export async function ensureRepoCloned(
 
   const repoPath = join(REPOS_DIR, slug);
 
+  // Remove broken clones that only contain .git metadata.
+  try {
+    await stat(repoPath);
+    await rm(repoPath, { recursive: true, force: true });
+  } catch {
+    // Directory does not exist yet.
+  }
+
   console.log(`  Cloning ${displayName} (${slug})...`);
 
   const proc = Bun.spawn(
@@ -82,13 +90,21 @@ export function getRepoPath(slug: string): string {
 }
 
 /**
- * Check if a repository has already been cloned
+ * Check if a repository has already been cloned with usable content.
  */
 export async function isRepoCloned(slug: string): Promise<boolean> {
   try {
-    const gitPath = join(getRepoPath(slug), '.git');
-    const info = await stat(gitPath);
-    return info.isDirectory();
+    const repoPath = getRepoPath(slug);
+    const gitPath = join(repoPath, '.git');
+    const gitInfo = await stat(gitPath);
+    if (!gitInfo.isDirectory()) {
+      return false;
+    }
+
+    const { readdir } = await import('node:fs/promises');
+    const entries = await readdir(repoPath);
+    // A valid clone has tracked files beyond .git (empty/failed clones do not).
+    return entries.some((entry) => entry !== '.git');
   } catch {
     return false;
   }

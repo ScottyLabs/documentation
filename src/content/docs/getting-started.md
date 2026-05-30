@@ -1,6 +1,8 @@
 ---
 title: Getting Started
 description: Learn how to use and contribute to ScottyLabs projects
+project: documentation
+repo: https://codeberg.org/ScottyLabs/documentation
 ---
 
 # Getting Started

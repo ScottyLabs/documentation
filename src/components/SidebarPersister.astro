@@ -1,82 +1,17 @@
 ---
 /**
- * Scroll-only sidebar persistence.
- *
- * Starlight's default persister restores <details> open/closed state from
- * sessionStorage, which hides unrelated sections after navigation (e.g. Getting
- * Started or /courses/src/overview/). We persist scroll position only.
+ * Sidebar wrapper without Starlight's open/closed or scroll persistence.
+ * The docs hub sidebar is always fully expanded and identical on every page.
  */
-import type { Props } from '@astrojs/starlight/props';
-
-declare global {
-	interface Window {
-		_starlightScrollRestore?: number;
-	}
-}
 ---
 
-<sl-sidebar-state-persist>
-	<script is:inline>
-		(() => {
-			try {
-				// Drop legacy Starlight state so old deploys cannot collapse groups.
-				sessionStorage.removeItem('sl-sidebar-state');
-
-				if (!matchMedia('(min-width: 50em)').matches) return;
-				const state = JSON.parse(sessionStorage.getItem('sl-sidebar-scroll') || '0');
-				if (typeof state?.scroll === 'number') {
-					window._starlightScrollRestore = state.scroll;
-				}
-			} catch {}
-		})();
-	</script>
-
-	<slot />
-
-	<script is:inline>
-		(() => {
-			const scroller = document.getElementById('starlight__sidebar');
-			if (!scroller) return;
-
-			for (const details of scroller.querySelectorAll('details[data-always-open]')) {
-				details.open = true;
-			}
-
-			const current = scroller.querySelector('[aria-current="page"]');
-			if (current) {
-				current.scrollIntoView({ block: 'center' });
-				return;
-			}
-
-			if (typeof window._starlightScrollRestore === 'number') {
-				scroller.scrollTop = window._starlightScrollRestore;
-				delete window._starlightScrollRestore;
-			}
-		})();
-	</script>
-</sl-sidebar-state-persist>
-
-<script>
-	const scroller = document.getElementById('starlight__sidebar');
-	const storageKey = 'sl-sidebar-scroll';
-
-	const storeScroll = () => {
+<script is:inline>
+	(() => {
 		try {
-			sessionStorage.setItem(
-				storageKey,
-				JSON.stringify({ scroll: scroller?.scrollTop || 0 })
-			);
+			sessionStorage.removeItem('sl-sidebar-state');
+			sessionStorage.removeItem('sl-sidebar-scroll');
 		} catch {}
-	};
-
-	addEventListener('visibilitychange', () => {
-		if (document.visibilityState === 'hidden') storeScroll();
-	});
-	addEventListener('pagehide', storeScroll);
+	})();
 </script>
 
-<style>
-	sl-sidebar-state-persist {
-		display: contents;
-	}
-</style>
+<slot />

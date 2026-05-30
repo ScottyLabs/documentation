@@ -1,12 +1,22 @@
 ---
 import { Icon } from '@astrojs/starlight/components';
 import type { Props } from '@astrojs/starlight/props';
-import { repoLinksFromEntry } from '../utils/repos';
+import { repoLinksFromEntry, type RepoPlatform } from '../utils/repos';
 
 const { dir, pagination, entry } = Astro.props;
 const { prev, next } = pagination;
 const isRtl = dir === 'rtl';
-const repos = repoLinksFromEntry(entry);
+const { slug, links } = repoLinksFromEntry(entry);
+
+const iconByPlatform: Record<RepoPlatform, 'codeberg' | 'github'> = {
+	codeberg: 'codeberg',
+	github: 'github',
+};
+
+const labelByPlatform: Record<RepoPlatform, string> = {
+	codeberg: 'Codeberg',
+	github: 'GitHub',
+};
 ---
 
 <div class="pagination-links" dir={dir}>
@@ -25,28 +35,26 @@ const repos = repoLinksFromEntry(entry);
 		)
 	}
 
-	<div class="repo-links">
-		<a
-			href={repos.codeberg}
-			class="repo-link"
-			target="_blank"
-			rel="noopener noreferrer"
-			title={`View ${repos.slug} on Codeberg`}
-		>
-			<Icon name="codeberg" size="1.5rem" />
-			<span class="sr-only">Codeberg</span>
-		</a>
-		<a
-			href={repos.github}
-			class="repo-link"
-			target="_blank"
-			rel="noopener noreferrer"
-			title={`View ${repos.slug} on GitHub`}
-		>
-			<Icon name="github" size="1.5rem" />
-			<span class="sr-only">GitHub</span>
-		</a>
-	</div>
+	{
+		links.length > 0 && (
+			<div class="repo-links">
+				{
+					links.map((link) => (
+						<a
+							href={link.url}
+							class="repo-link"
+							target="_blank"
+							rel="noopener noreferrer"
+							title={`View ${slug} on ${labelByPlatform[link.platform]}`}
+						>
+							<Icon name={iconByPlatform[link.platform]} size="1.5rem" />
+							<span class="sr-only">{labelByPlatform[link.platform]}</span>
+						</a>
+					))
+				}
+			</div>
+		)
+	}
 
 	{
 		next ? (

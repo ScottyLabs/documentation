@@ -32,9 +32,13 @@ async function build() {
     let governanceProjects = [];
     try {
       await cloneGovernance();
+    } catch (error) {
+      console.warn('⚠️  Could not clone governance, trying local/monorepo paths');
+    }
+    try {
       governanceProjects = await discoverProjectsFromGovernance();
     } catch (error) {
-      console.warn('⚠️  Could not fetch governance data, using manual projects only');
+      console.warn('⚠️  Could not read governance data, using manual projects only');
     }
     
     // Merge projects (manual overrides governance)
@@ -51,29 +55,27 @@ async function build() {
     console.log(`📦 Total projects to build: ${allProjects.length}\n`);
 
     if (allProjects.length === 0) {
-      console.log('ℹ️  No projects found');
-      console.log('   - Add projects to projects.toml, OR');
-      console.log('   - Register repositories in governance (docs included by default)\n');
-      return;
+      console.warn('⚠️  No projects discovered — only Welcome pages will appear in the sidebar');
+      console.warn('   Check governance clone and ../governance monorepo path\n');
+    } else {
+      // Clone external repositories only
+      await cloneAllRepos(allProjects);
+
+      // Aggregate Starlight documentation (hub uses ./docs, not src/content/docs)
+      await aggregateStarlightDocs(allProjects);
+
+      // Process OpenAPI projects
+      await processOpenApiProjects(remoteProjects);
+
+      // Build Rust documentation
+      await buildRustDocs(remoteProjects);
     }
 
-    // Clone external repositories only
-    await cloneAllRepos(allProjects);
-
-    // Aggregate Starlight documentation (hub uses ./docs, not src/content/docs)
-    await aggregateStarlightDocs(allProjects);
-
-    // Process OpenAPI projects
-    await processOpenApiProjects(remoteProjects);
-
-    // Build Rust documentation
-    await buildRustDocs(remoteProjects);
-
-    // Generate navigation
+    // Always regenerate astro.config.mjs so the sidebar matches discovered projects.
     await generateNavigation(allProjects);
     
     const duration = ((Date.now() - startTime) / 1000).toFixed(2);
-    console.log(`✨ Build completed in ${duration}s\n`);
+    console.log(`✨ Build prep completed in ${duration}s\n`);
     
   } catch (error) {
     console.error('\n❌ Build failed:', error);

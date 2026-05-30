@@ -1,0 +1,18 @@
+[
+  {
+    "from": "tartan-vote/frontend/README",
+    "to": "tartan-vote/frontend/readme"
+  },
+  {
+    "from": "tartan-vote/SETUP",
+    "to": "tartan-vote/setup"
+  },
+  {
+    "from": "tartan-vote/CONTRIBUTING",
+    "to": "tartan-vote/contributing"
+  },
+  {
+    "from": "documentation/index",
+    "to": "documentation"
+  }
+]

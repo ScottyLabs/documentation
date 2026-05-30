@@ -16,7 +16,3 @@ export function flattenSidebar(sidebar: SidebarEntry[]): SidebarLink[] {
 		entry.type === 'group' ? flattenSidebar(entry.entries) : entry
 	);
 }
-
-export function isGroupOpen(entry: SidebarGroup): boolean {
-	return !entry.collapsed || flattenSidebar(entry.entries).some((link) => link.isCurrent);
-}

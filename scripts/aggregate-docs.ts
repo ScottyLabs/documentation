@@ -3,7 +3,7 @@
  * Handles copying and merging markdown content from projects
  */
 
-import { mkdir, readdir, stat } from 'node:fs/promises';
+import { mkdir, readdir, rm, stat } from 'node:fs/promises';
 import { join, basename } from 'node:path';
 import type { Project } from './manifest.ts';
 import {
@@ -11,8 +11,17 @@ import {
   resolveProjectDocsDir,
   resolveProjectRepoRoot,
 } from './manifest.ts';
+import {
+  type Redirect,
+  normalizeEntryName,
+  recordFileRedirects,
+  rewriteMarkdownLinks,
+  saveRedirects,
+} from './redirects.ts';
 
 const CONTENT_DIR = 'src/content/docs';
+
+let aggregationRedirects: Redirect[] = [];
 
 /** mdBook and similar tools use these as navigation metadata, not pages. */
 const SKIPPED_MARKDOWN_FILES = new Set(['SUMMARY.md', 'SUMMARY.mdx']);
@@ -25,12 +34,16 @@ const SKIPPED_SHELL_FILES = new Set(['index.mdx', 'getting-started.md']);
  */
 export async function aggregateStarlightDocs(projects: Project[]): Promise<void> {
   console.log(`\n📚 Aggregating Starlight documentation...\n`);
+
+  aggregationRedirects = [];
   
   const starlightProjects = projects.filter(p => p.type === 'starlight');
   
   for (const project of starlightProjects) {
     await aggregateProjectDocs(project);
   }
+
+  await saveRedirects(aggregationRedirects);
   
   console.log('✅ Documentation aggregated\n');
 }
@@ -58,7 +71,8 @@ async function aggregateProjectDocs(project: Project): Promise<void> {
     return;
   }
   
-  // Create target directory
+  // Replace project docs each build so renamed/lowercased files do not linger.
+  await rm(targetDocs, { recursive: true, force: true });
   await mkdir(targetDocs, { recursive: true });
   
   // Copy all markdown files
@@ -80,13 +94,21 @@ async function copyMarkdownFiles(
   
   for (const entry of entries) {
     const sourcePath = join(source, entry.name);
-    const targetPath = join(target, entry.name);
+    const normalizedName = normalizeEntryName(entry.name);
+    const targetPath = join(target, normalizedName);
     const entryRelativePath = join(relativePath, entry.name);
+    const normalizedRelativePath = join(relativePath, normalizedName);
     
     if (entry.isDirectory()) {
       await mkdir(targetPath, { recursive: true });
       await copyMarkdownFiles(sourcePath, targetPath, project, entryRelativePath);
     } else if (entry.isFile() && isAggregateableMarkdown(entry.name, project)) {
+      recordFileRedirects(
+        aggregationRedirects,
+        project.slug,
+        entryRelativePath,
+        normalizedRelativePath
+      );
       await processMarkdownFile(sourcePath, targetPath, project);
     }
   }
@@ -179,7 +201,8 @@ async function processMarkdownFile(
   const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n/);
 
   const existingFrontmatter = frontmatterMatch?.[1] ?? '';
-  const body = frontmatterMatch ? content.slice(frontmatterMatch[0].length) : content;
+  const rawBody = frontmatterMatch ? content.slice(frontmatterMatch[0].length) : content;
+  const body = rewriteMarkdownLinks(rawBody);
   const title =
     titleFromFrontmatter(existingFrontmatter) ?? deriveTitle(body, basename(sourcePath));
   const frontmatter = buildFrontmatter(existingFrontmatter, title, project);

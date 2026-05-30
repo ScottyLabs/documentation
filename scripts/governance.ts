@@ -3,7 +3,7 @@
  * Discovers repositories from governance (docs hub inclusion is on by default; opt out with docs = false)
  */
 
-import { readdir, readFile } from 'node:fs/promises';
+import { readdir, readFile, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import { parse as parseToml } from 'smol-toml';
 import type { Project } from './manifest.ts';
@@ -131,13 +131,43 @@ function collectDocsReposFromTeam(teamData: GovernanceTeam): Project[] {
 }
 
 /**
+ * Resolve governance team definitions from clone or monorepo checkout.
+ */
+async function resolveGovernanceTeamsDir(): Promise<string | null> {
+  const candidates = [
+    join('.repos', GOVERNANCE_SLUG, 'data', 'teams'),
+    join('..', 'governance', 'data', 'teams'),
+  ];
+
+  for (const dir of candidates) {
+    try {
+      await stat(dir);
+      if (dir.startsWith('..')) {
+        console.log('  ✓ Using monorepo governance at ../governance');
+      }
+      return dir;
+    } catch {
+      continue;
+    }
+  }
+
+  return null;
+}
+
+/**
  * Discover projects with docs flag from governance
  */
 export async function discoverProjectsFromGovernance(): Promise<Project[]> {
   console.log('🔍 Discovering projects from governance...');
 
-  const teamsDir = join('.repos', GOVERNANCE_SLUG, 'data', 'teams');
+  const teamsDir = await resolveGovernanceTeamsDir();
   const projects: Project[] = [];
+
+  if (!teamsDir) {
+    console.warn('  ⚠️  Could not read governance teams directory');
+    console.warn('  Continuing with manually configured projects only');
+    return [];
+  }
 
   try {
     const files = await readdir(teamsDir);
