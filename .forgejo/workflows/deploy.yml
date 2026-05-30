@@ -39,31 +39,38 @@ jobs:
 
       - name: Upload to Garage
         if: github.ref == 'refs/heads/main'
-        run: |
-          set -euo pipefail
-          nix shell nixpkgs#awscli2 --command bash -c '
-            export AWS_ACCESS_KEY_ID="$GARAGE_ACCESS_KEY"
-            export AWS_SECRET_ACCESS_KEY="$GARAGE_SECRET_KEY"
-            export AWS_DEFAULT_REGION=us-east-1
-
-            if ! aws s3 ls "s3://$GARAGE_BUCKET/" \
-              --endpoint-url "$GARAGE_ENDPOINT" >/dev/null 2>&1; then
-              echo "::error::Garage credentials rejected (No such key / AccessDenied)."
-              echo "Ensure tofu-garage has been applied and Forgejo secrets match:"
-              echo "  GARAGE_ENDPOINT=https://s3.scottylabs.org"
-              echo "  GARAGE_ACCESS_KEY / GARAGE_SECRET_KEY from tofu output scottylabs_docs_writer_*"
-              echo "Do not reuse scottylabs_assets_writer credentials."
-              exit 1
-            fi
-
-            aws s3 sync dist/ "s3://$GARAGE_BUCKET/" \
-              --endpoint-url "$GARAGE_ENDPOINT" \
-              --region us-east-1 \
-              --delete \
-              --cache-control "public, max-age=3600"
-          '
         env:
           GARAGE_ENDPOINT: ${{ secrets.GARAGE_ENDPOINT }}
           GARAGE_ACCESS_KEY: ${{ secrets.GARAGE_ACCESS_KEY }}
           GARAGE_SECRET_KEY: ${{ secrets.GARAGE_SECRET_KEY }}
           GARAGE_BUCKET: scottylabs-docs
+          AWS_ACCESS_KEY_ID: ${{ secrets.GARAGE_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.GARAGE_SECRET_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+        run: |
+          set -euo pipefail
+
+          if [ -z "${GARAGE_ACCESS_KEY:-}" ] || [ -z "${GARAGE_SECRET_KEY:-}" ] || [ -z "${GARAGE_ENDPOINT:-}" ]; then
+            echo "::error::Garage secrets are missing or empty in Forgejo (Settings → Actions → Secrets)."
+            exit 1
+          fi
+
+          echo "Checking Garage access (bucket=${GARAGE_BUCKET}, endpoint=${GARAGE_ENDPOINT})..."
+          if ! nix shell nixpkgs#awscli2 --command aws s3 ls "s3://${GARAGE_BUCKET}/" \
+            --endpoint-url "${GARAGE_ENDPOINT}" \
+            --region us-east-1; then
+            echo "::error::Garage credentials rejected."
+            echo "On infra-01, verify the key exists:"
+            echo "  sudo tofu -chdir=/var/lib/tofu-garage state list | grep scottylabs_docs"
+            echo "Then re-copy secrets from:"
+            echo "  tofu output -raw scottylabs_docs_writer_access_key_id"
+            echo "  tofu output -raw scottylabs_docs_writer_secret_access_key"
+            echo "GARAGE_ENDPOINT must be https://s3.scottylabs.org (not garage.scottylabs.org)."
+            exit 1
+          fi
+
+          nix shell nixpkgs#awscli2 --command aws s3 sync dist/ "s3://${GARAGE_BUCKET}/" \
+            --endpoint-url "${GARAGE_ENDPOINT}" \
+            --region us-east-1 \
+            --delete \
+            --cache-control "public, max-age=3600"
