@@ -187,6 +187,7 @@ export default defineConfig({
         github: 'https://github.com/ScottyLabs',
       },
       components: {
+        MarkdownContent: './src/components/MarkdownContent.astro',
         Pagination: './src/components/Pagination.astro',
         Sidebar: './src/components/Sidebar.astro',
       },
@@ -202,6 +203,7 @@ export default defineConfig({
       ],
       customCss: [
         './src/styles/scalar-theme.css',
+        './src/styles/heading-links.css',
       ],
     }),
   ],
