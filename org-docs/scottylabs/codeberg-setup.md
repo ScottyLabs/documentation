@@ -1,12 +1,12 @@
 ---
-title: CodeBerg Setup
+title: Codeberg Setup
 ---
 
 This guide walks you through registering on Codeberg and configuring SSH so you can clone and push to ScottyLabs repositories. It should take about 3–5 minutes.
 
 If you only need GitHub access, skip steps 1 and 3; complete step 3.5 instead.
 
-## 1. Register a CodeBerg account
+## 1. Register a Codeberg account
 
 Go to [codeberg.org/user/sign_up](https://codeberg.org/user/sign_up) and create an account.
 
@@ -40,7 +40,7 @@ cat ~/.ssh/id_ed25519.pub
 
 It should look like `ssh-ed25519 <hash> <your-email>`. Copy the entire line.
 
-## 3. Add the key to CodeBerg
+## 3. Add the key to Codeberg
 
 1. Open [SSH / GPG keys](https://codeberg.org/user/settings/keys) in your Codeberg settings.
 2. Click **Add key**.
@@ -77,7 +77,7 @@ Enter your passphrase when prompted.
 
 ## 4. Test authentication
 
-Test CodeBerg:
+Test Codeberg:
 
 ```bash
 ssh -T git@codeberg.org
