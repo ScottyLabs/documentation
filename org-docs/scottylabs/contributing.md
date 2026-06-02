@@ -53,7 +53,7 @@ that you will be working on.
 
 ### Setup and Develop
 
-This process is very team dependent, so please refer to the guides in the corresponding repository.
+Set up SSH for Codeberg (and optionally GitHub) using the [CodeBerg Setup](/scottylabs/codeberg-setup/) guide. Repository-specific setup steps are in each project's docs.
 
 ### Submit a Pull Request and Get Credited as a Contributor
 
