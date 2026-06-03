@@ -1,42 +1,61 @@
 /**
  * Repository cloning utilities
- * Handles parallel cloning of project repositories
+ * Resolves project checkouts from monorepo siblings or shallow clones.
  */
 
-import { mkdir, rm, stat } from 'node:fs/promises';
+import { mkdir, readdir, rm, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { Project } from './manifest.ts';
 import { isDocumentationHubProject } from './manifest.ts';
 
 const REPOS_DIR = '.repos';
 
-/**
- * Clone all project repositories in parallel
- */
-export async function cloneAllRepos(projects: Project[]): Promise<void> {
-  const reposToClone = projects.filter((project) => {
-    if (isDocumentationHubProject(project)) {
-      console.warn(
-        `  ⚠️  Skipping clone for ${project.slug}: documentation hub cannot pull itself`
-      );
-      return false;
-    }
-    return true;
-  });
+/** Populated by resolveAllRepoRoots before aggregation. */
+const resolvedRepoRoots = new Map<string, string>();
 
-  console.log(`\n📦 Cloning ${reposToClone.length} repositories...\n`);
+/**
+ * Resolve and clone all external project repositories.
+ * Prefers sibling directories in a monorepo (e.g. ../infrastructure) over cloning.
+ */
+export async function resolveAllRepoRoots(projects: Project[]): Promise<void> {
+  resolvedRepoRoots.clear();
+
+  const external = projects.filter((project) => !isDocumentationHubProject(project));
+  console.log(`\n📦 Resolving ${external.length} project repositories...\n`);
 
   await mkdir(REPOS_DIR, { recursive: true });
 
-  const clonePromises = reposToClone.map((project) =>
-    ensureRepoCloned(project.repo, project.slug, project.name).catch((error) => {
-      console.error(`❌ Failed to clone ${project.slug}:`, error.message);
-      throw error;
-    })
-  );
+  for (const project of external) {
+    await resolveProjectRepoRoot(project);
+  }
 
-  await Promise.all(clonePromises);
-  console.log('\n✅ All repositories cloned successfully\n');
+  console.log('\n✅ All project repositories resolved\n');
+}
+
+async function resolveProjectRepoRoot(project: Project): Promise<void> {
+  const siblingPath = join('..', project.slug);
+  if (await isUsableCheckout(siblingPath)) {
+    resolvedRepoRoots.set(project.slug, siblingPath);
+    console.log(`  ✓ ${project.name} (${project.slug}) → monorepo ${siblingPath}`);
+    return;
+  }
+
+  await ensureRepoCloned(project.repo, project.slug, project.name);
+  resolvedRepoRoots.set(project.slug, getRepoPath(project.slug));
+}
+
+async function isUsableCheckout(path: string): Promise<boolean> {
+  try {
+    const info = await stat(path);
+    if (!info.isDirectory()) {
+      return false;
+    }
+
+    const entries = await readdir(path);
+    return entries.some((entry) => entry !== '.git');
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -47,14 +66,13 @@ export async function ensureRepoCloned(
   slug: string,
   displayName = slug
 ): Promise<void> {
+  const repoPath = getRepoPath(slug);
+
   if (await isRepoCloned(slug)) {
     console.log(`  ✓ ${displayName} (${slug}) already cloned`);
     return;
   }
 
-  const repoPath = join(REPOS_DIR, slug);
-
-  // Remove broken clones that only contain .git metadata.
   try {
     await stat(repoPath);
     await rm(repoPath, { recursive: true, force: true });
@@ -83,9 +101,13 @@ export async function ensureRepoCloned(
 }
 
 /**
- * Get the path to a cloned repository
+ * Filesystem root for a project during build (after resolveAllRepoRoots).
  */
 export function getRepoPath(slug: string): string {
+  const resolved = resolvedRepoRoots.get(slug);
+  if (resolved) {
+    return resolved;
+  }
   return join(REPOS_DIR, slug);
 }
 
@@ -93,17 +115,19 @@ export function getRepoPath(slug: string): string {
  * Check if a repository has already been cloned with usable content.
  */
 export async function isRepoCloned(slug: string): Promise<boolean> {
+  if (resolvedRepoRoots.has(slug)) {
+    return true;
+  }
+
   try {
-    const repoPath = getRepoPath(slug);
+    const repoPath = join(REPOS_DIR, slug);
     const gitPath = join(repoPath, '.git');
     const gitInfo = await stat(gitPath);
     if (!gitInfo.isDirectory()) {
       return false;
     }
 
-    const { readdir } = await import('node:fs/promises');
     const entries = await readdir(repoPath);
-    // A valid clone has tracked files beyond .git (empty/failed clones do not).
     return entries.some((entry) => entry !== '.git');
   } catch {
     return false;
@@ -111,16 +135,17 @@ export async function isRepoCloned(slug: string): Promise<boolean> {
 }
 
 /**
- * Clean up cloned repositories
+ * Clean up cloned repositories (not monorepo siblings).
  */
 export async function cleanRepos(): Promise<void> {
   console.log('🧹 Cleaning up cloned repositories...');
-  
+
   const proc = Bun.spawn(['rm', '-rf', REPOS_DIR], {
     stdout: 'pipe',
     stderr: 'pipe',
   });
-  
+
   await proc.exited;
+  resolvedRepoRoots.clear();
   console.log('✅ Repositories cleaned');
 }

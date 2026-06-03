@@ -105,6 +105,16 @@ function repoDisplayName(repo: GovernanceRepo): string {
  */
 export async function cloneGovernance(): Promise<void> {
   console.log('📋 Fetching governance data...');
+
+  const sibling = join('..', GOVERNANCE_SLUG);
+  try {
+    await stat(join(sibling, 'data', 'teams'));
+    console.log('  ✓ Using monorepo governance at ../governance\n');
+    return;
+  } catch {
+    // Fall through to clone.
+  }
+
   await ensureRepoCloned(GOVERNANCE_REPO, GOVERNANCE_SLUG, 'governance');
   console.log('  ✓ Governance data fetched\n');
 }

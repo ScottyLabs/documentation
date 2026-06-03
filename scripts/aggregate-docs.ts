@@ -9,8 +9,8 @@ import type { Project } from './manifest.ts';
 import {
   isDocumentationHubProject,
   resolveProjectDocsDir,
-  resolveProjectRepoRoot,
 } from './manifest.ts';
+import { getRepoPath } from './clone-repos.ts';
 import {
   type Redirect,
   normalizeEntryName,
@@ -54,7 +54,7 @@ export async function aggregateStarlightDocs(projects: Project[]): Promise<void>
 async function aggregateProjectDocs(project: Project): Promise<void> {
   console.log(`  Processing ${project.name}...`);
   
-  const repoPath = resolveProjectRepoRoot(project);
+  const repoPath = isDocumentationHubProject(project) ? '.' : getRepoPath(project.slug);
   const sourceDocs = join(repoPath, resolveProjectDocsDir(project));
   const targetDocs = join(CONTENT_DIR, project.slug);
 
@@ -233,23 +233,18 @@ async function processMarkdownFile(
 }
 
 /**
- * Clean up aggregated documentation
+ * Clean up aggregated documentation, preserving Starlight shell pages at the content root.
  */
 export async function cleanDocs(): Promise<void> {
   console.log('🧹 Cleaning up aggregated documentation...');
-  
+
   const entries = await readdir(CONTENT_DIR, { withFileTypes: true });
-  
+
   for (const entry of entries) {
-    if (entry.isDirectory() && !['getting-started.md', 'index.mdx'].includes(entry.name)) {
-      const dirPath = join(CONTENT_DIR, entry.name);
-      const proc = Bun.spawn(['rm', '-rf', dirPath], {
-        stdout: 'pipe',
-        stderr: 'pipe',
-      });
-      await proc.exited;
+    if (entry.isDirectory()) {
+      await rm(join(CONTENT_DIR, entry.name), { recursive: true, force: true });
     }
   }
-  
+
   console.log('✅ Documentation cleaned');
 }

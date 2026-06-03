@@ -5,7 +5,7 @@
 
 import { parseManifest, externalProjects, isDocumentationHubProject } from './manifest.ts';
 import { cloneGovernance, discoverProjectsFromGovernance, mergeProjects } from './governance.ts';
-import { cloneAllRepos, cleanRepos } from './clone-repos.ts';
+import { resolveAllRepoRoots, cleanRepos } from './clone-repos.ts';
 import { aggregateStarlightDocs, cleanDocs } from './aggregate-docs.ts';
 import { processOpenApiProjects, cleanOpenApiSpecs } from './scalar-integration.ts';
 import { buildRustDocs, cleanRustDocs } from './rustdoc.ts';
@@ -58,8 +58,8 @@ async function build() {
       console.warn('⚠️  No projects discovered — only Welcome pages will appear in the sidebar');
       console.warn('   Check governance clone and ../governance monorepo path\n');
     } else {
-      // Clone external repositories only
-      await cloneAllRepos(allProjects);
+      // Resolve monorepo siblings or clone external repositories
+      await resolveAllRepoRoots(allProjects);
 
       // Aggregate Starlight documentation (hub uses ./docs, not src/content/docs)
       await aggregateStarlightDocs(allProjects);

@@ -78,17 +78,6 @@ export function resolveProjectDocsDir(project: Pick<Project, 'slug' | 'repo' | '
 }
 
 /**
- * Filesystem root for a project during build.
- * The hub repo is already checked out — read its docs/ in place, never clone it.
- */
-export function resolveProjectRepoRoot(project: Pick<Project, 'slug' | 'repo'>): string {
-  if (isDocumentationHubProject(project)) {
-    return '.';
-  }
-  return join('.repos', project.slug);
-}
-
-/**
  * Projects that live in external repositories (excludes this hub).
  */
 export function externalProjects(projects: Project[]): Project[] {

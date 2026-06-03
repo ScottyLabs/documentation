@@ -9,8 +9,10 @@ This site aggregates documentation from ScottyLabs projects. Repositories are in
 ## How it works
 
 1. Governance registers repositories (docs hub inclusion is on by default)
-2. CI clones each repo and copies its `docs/` directory into this site
+2. At build time, CI resolves each repo (monorepo sibling or shallow clone) and copies its `docs/` directory into this site
 3. The built site is published to [docs.scottylabs.org](https://docs.scottylabs.org)
+
+Aggregated pages under `src/content/docs/<project>/` are **not stored in git** — edit documentation in each project's own repository.
 
 This repository's own pages live here under **Documentation Hub** — separate from the Starlight site shell in `src/content/docs/`.
 
@@ -24,4 +26,4 @@ name = "my-internal-tool"
 docs = false
 ```
 
-Commit markdown to `docs/` in your repository. Changes deploy automatically when governance or your repo triggers a rebuild.
+Commit markdown to `docs/` in your repository, then trigger a documentation rebuild (push to this repo, or run the deploy workflow manually).
