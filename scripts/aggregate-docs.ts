@@ -26,6 +26,9 @@ let aggregationRedirects: Redirect[] = [];
 /** mdBook and similar tools use these as navigation metadata, not pages. */
 const SKIPPED_MARKDOWN_FILES = new Set(['SUMMARY.md', 'SUMMARY.mdx']);
 
+/** AI agent context ([agents.md](https://agents.md/)); repo-local only, not published pages. */
+const SKIPPED_AGENT_FILES = new Set(['AGENTS.md']);
+
 /** Starlight site shell — not project documentation. */
 const SKIPPED_SHELL_FILES = new Set(['index.mdx', 'getting-started.md', '404.md']);
 
@@ -118,7 +121,7 @@ function isAggregateableMarkdown(name: string, project: Project): boolean {
   if (!name.endsWith('.md') && !name.endsWith('.mdx')) {
     return false;
   }
-  if (SKIPPED_MARKDOWN_FILES.has(name)) {
+  if (SKIPPED_MARKDOWN_FILES.has(name) || SKIPPED_AGENT_FILES.has(name)) {
     return false;
   }
   if (isDocumentationHubProject(project) && SKIPPED_SHELL_FILES.has(name)) {
