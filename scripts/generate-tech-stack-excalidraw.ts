@@ -389,9 +389,9 @@ const scene = {
   appState: {
     viewBackgroundColor: '#ffffff',
     gridSize: 20,
-    zoom: { value: 0.55 },
-    scrollX: 120,
-    scrollY: 40,
+    zoom: { value: 0.85 },
+    scrollX: 60,
+    scrollY: 20,
   },
   files: {},
 };

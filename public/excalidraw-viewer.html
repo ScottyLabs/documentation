@@ -33,14 +33,49 @@
       }
 
       const scene = await response.json();
+      let excalidrawAPI = null;
+      let viewportMode = 'embedded';
+
+      function applyViewport(mode) {
+        if (!excalidrawAPI) {
+          return;
+        }
+
+        viewportMode = mode;
+
+        if (mode === 'fullscreen') {
+          excalidrawAPI.updateScene({
+            appState: {
+              zoom: { value: 1 },
+              scrollX: 80,
+              scrollY: 40,
+            },
+          });
+          return;
+        }
+
+        excalidrawAPI.scrollToContent(undefined, { fitToViewport: true });
+      }
+
+      window.addEventListener('message', (event) => {
+        if (event.origin !== window.location.origin) {
+          return;
+        }
+        if (event.data?.type === 'excalidraw-viewport') {
+          applyViewport(event.data.mode);
+        }
+      });
 
       createRoot(document.getElementById('root')).render(
         React.createElement(Excalidraw, {
           initialData: scene,
           viewModeEnabled: true,
-          zenModeEnabled: true,
+          zenModeEnabled: false,
           gridModeEnabled: false,
-          scrollToContent: true,
+          excalidrawAPI: (api) => {
+            excalidrawAPI = api;
+            applyViewport(viewportMode);
+          },
           UIOptions: {
             canvasActions: {
               changeViewBackgroundColor: false,

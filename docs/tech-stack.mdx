@@ -4,7 +4,7 @@ title: Tech Stack
 
 import ExcalidrawDiagram from '@/components/ExcalidrawDiagram.astro';
 
-ScottyLabs platform overview. **Pan and zoom** the diagram below; repo boxes link to Codeberg when clicked. Orange borders or **\*** mark services that export Prometheus metrics.
+ScottyLabs platform overview. **Pan and zoom** the diagram below (scroll or pinch inside the frame; use the toolbar zoom controls). Hover the diagram and click **fullscreen** for a larger view. Repo boxes link to Codeberg when clicked. Orange borders or **\*** mark services that export Prometheus metrics.
 
 The diagram reads left to right: **governance**, then **infra-01** and **deploy-01**. On every host, **Tailscale** (Headscale client) and **host exporters** run alongside **Caddy**. Public web traffic hits **Caddy first**; tailnet-only services like pgAdmin use **Headscale → Caddy → app** (the reverse order from the [Caddy OIDC proxy](#caddy-oidc-proxy) pattern). Cross-host links are described in prose below the diagram.
 
