@@ -12,9 +12,9 @@ This site aggregates documentation from ScottyLabs projects. Repositories are in
 2. At build time, CI resolves each repo (monorepo sibling or shallow clone) and copies its `docs/` directory into this site
 3. The built site is published to [docs.scottylabs.org](https://docs.scottylabs.org)
 
-Aggregated pages under `src/content/docs/<project>/` are **not stored in git** — edit documentation in each project's own repository.
+Aggregated pages under `src/content/docs/<project>/` are **not stored in git**. Edit documentation in each project's own repository.
 
-This repository's own pages live here under **Documentation Hub** — separate from the Starlight site shell in `src/content/docs/`.
+This repository's own pages live here under **Documentation Hub**, separate from the Starlight site shell in `src/content/docs/`.
 
 ## Adding your project
 

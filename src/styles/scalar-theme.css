@@ -6,11 +6,11 @@
   --sl-color-accent-low: #60a5fa;
   --sl-color-accent-high: #2563eb;
 
-  /* Right "On this page" sidebar only — leave the left nav unchanged */
+  /* Right "On this page" sidebar only; leave the left nav unchanged */
   --sl-right-sidebar-width: calc(var(--sl-sidebar-width) * 0.6);
 }
 
-/* Keep the full nav tree visible — do not clip groups on short pages. */
+/* Keep the full nav tree visible; do not clip groups on short pages. */
 :global(#starlight__sidebar .sidebar-content) {
   height: auto !important;
   min-height: 100%;

@@ -2,7 +2,7 @@ import { join } from 'node:path';
 
 export type ProjectType = 'starlight' | 'rust' | 'openapi';
 
-/** Slug/repo name of this repository — must never be cloned during build. */
+/** Slug/repo name of this repository; must never be cloned during build. */
 export const DOCUMENTATION_HUB_SLUG = 'documentation';
 
 /** Hub-local doc sources that live in this repo (not cloned from .repos/). */

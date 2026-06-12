@@ -55,7 +55,7 @@ async function build() {
     console.log(`📦 Total projects to build: ${allProjects.length}\n`);
 
     if (allProjects.length === 0) {
-      console.warn('⚠️  No projects discovered — only Welcome pages will appear in the sidebar');
+      console.warn('⚠️  No projects discovered; only Welcome pages will appear in the sidebar');
       console.warn('   Check governance clone and ../governance monorepo path\n');
     } else {
       // Resolve monorepo siblings or clone external repositories

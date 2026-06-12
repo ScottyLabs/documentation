@@ -1,4 +1,4 @@
-/* Heading anchor buttons — copy section link on click, visible on hover */
+/* Heading anchor buttons: copy section link on click, visible on hover */
 
 :global(.sl-markdown-content .sl-heading-wrapper) {
 	display: flex;
