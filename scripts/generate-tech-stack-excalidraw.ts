@@ -153,17 +153,28 @@ function frame(x: number, y: number, w: number, h: number, label: string) {
   });
 }
 
-function downArrow(from: Box, to: Box, dashed = false) {
+function arrowBetween(
+  startX: number,
+  startY: number,
+  endX: number,
+  endY: number,
+  from: Box,
+  to: Box,
+  dashed = false,
+) {
   const id = uid('arrow');
-  const dx = to.cx - from.cx;
-  const dy = to.y - from.bottom;
+  const x = Math.min(startX, endX);
+  const y = Math.min(startY, endY);
+  const width = Math.abs(endX - startX);
+  const height = Math.abs(endY - startY);
+
   elements.push({
     ...base(id),
     type: 'arrow',
-    x: from.cx,
-    y: from.bottom,
-    width: dx,
-    height: dy,
+    x,
+    y,
+    width,
+    height,
     strokeColor: '#495057',
     backgroundColor: 'transparent',
     fillStyle: 'solid',
@@ -172,8 +183,8 @@ function downArrow(from: Box, to: Box, dashed = false) {
     roughness: 0,
     opacity: 100,
     points: [
-      [0, 0],
-      [dx, dy],
+      [startX - x, startY - y],
+      [endX - x, endY - y],
     ],
     startBinding: { elementId: from.rectId, focus: 0, gap: 4 },
     endBinding: { elementId: to.rectId, focus: 0, gap: 4 },
@@ -183,34 +194,12 @@ function downArrow(from: Box, to: Box, dashed = false) {
   });
 }
 
+function downArrow(from: Box, to: Box, dashed = false) {
+  arrowBetween(from.cx, from.bottom, to.cx, to.y, from, to, dashed);
+}
+
 function rightArrow(from: Box, to: Box, dashed = false) {
-  const id = uid('arrow');
-  const dx = to.x - from.right;
-  const dy = to.cy - from.cy;
-  elements.push({
-    ...base(id),
-    type: 'arrow',
-    x: from.right,
-    y: from.cy,
-    width: dx,
-    height: dy,
-    strokeColor: '#495057',
-    backgroundColor: 'transparent',
-    fillStyle: 'solid',
-    strokeWidth: 2,
-    strokeStyle: dashed ? 'dashed' : 'solid',
-    roughness: 0,
-    opacity: 100,
-    points: [
-      [0, 0],
-      [dx, dy],
-    ],
-    startBinding: { elementId: from.rectId, focus: 0, gap: 4 },
-    endBinding: { elementId: to.rectId, focus: 0, gap: 4 },
-    startArrowhead: null,
-    endArrowhead: 'arrow',
-    link: null,
-  });
+  arrowBetween(from.right, from.cy, to.x, to.cy, from, to, dashed);
 }
 
 function note(x: number, y: number, text: string, w = 320) {
@@ -249,7 +238,7 @@ function repo(x: number, y: number, name: string, opts: BoxOpts = {}) {
 const GOV_X = 40;
 let gy = 72;
 
-frame(GOV_X - 12, 40, 220, 500, 'Governance');
+frame(GOV_X - 12, 40, 220, 660, 'Governance');
 
 const gov = repo(GOV_X, gy, 'governance', { w: 180 });
 gy += 52;
@@ -379,16 +368,15 @@ const iaBatch = box(DEP_X + 500, dy + 120, 'internet-archive · batch job', { w:
 downArrow(tailDeploy, tailCaddyDeploy);
 downArrow(tailCaddyDeploy, pgDeploy);
 
-// Cross-host / repo links
-rightArrow(infraRepo, tailInfra);
-rightArrow(infraRepo, tailDeploy);
-rightArrow(obsRepo, promScraper, true);
-rightArrow(docsRepo, docsHost, true);
-rightArrow(keycloakThemeRepo, idKeycloak, true);
-rightArrow(kennelRepo, kennelSvc, true);
-rightArrow(devenvRepo, kennelSvc, true);
-rightArrow(iaRepo, iaBatch, true);
+// Short in-host links only (long cross-column arrows blow up Excalidraw's canvas).
 rightArrow(promScraper, hostExpInfra, true);
+
+note(
+  GOV_X,
+  gy + 12,
+  'Repos → hosts: infrastructure configures both NixOS columns; observability → Prometheus; documentation → docs site; kennel/devenv → kennel platform; internet-archive → batch job.',
+  220,
+);
 
 await mkdir(join(import.meta.dir, '../src/diagrams'), { recursive: true });
 await mkdir(join(import.meta.dir, '../public/diagrams'), { recursive: true });
@@ -401,6 +389,9 @@ const scene = {
   appState: {
     viewBackgroundColor: '#ffffff',
     gridSize: 20,
+    zoom: { value: 0.55 },
+    scrollX: 120,
+    scrollY: 40,
   },
   files: {},
 };
