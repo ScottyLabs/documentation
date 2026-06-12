@@ -20,6 +20,8 @@ Enable the repo in governance (included by default). Use `docs = false` to opt o
 
 `AGENTS.md` files (AI agent context per [agents.md](https://agents.md/)) are **not** aggregated or published. Put human-facing docs in other markdown files.
 
+Published pages are readable by AI agents via [Accept Markdown](https://acceptmarkdown.com/) — request any docs URL with `Accept: text/markdown` to receive Markdown from the same URL browsers use for HTML.
+
 ## Local development
 
 Run `bun run dev`; it fetches docs from source repos before starting the dev server. In a monorepo checkout, sibling repos (e.g. `../infrastructure`) are used automatically.

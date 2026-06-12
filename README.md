@@ -21,8 +21,23 @@ Every ScottyLabs project, guide, process, and resource in one place:
 - **OpenAPI support**: Interactive API documentation with Scalar
 - **Rustdoc integration**: Automatic rustdoc generation and hosting
 - **Full-text search**: Find anything across all projects (powered by Pagefind)
+- **AI agent access**: Pages serve Markdown via `Accept: text/markdown` ([Accept Markdown](https://acceptmarkdown.com/))
 - **CI/CD ready**: Rebuilds automatically when any project updates docs
 - **Nix-powered**: Reproducible builds and deployment via Nix flake
+
+## AI / LLM access
+
+The docs site supports [Accept Markdown](https://acceptmarkdown.com/) content negotiation. AI agents can read any page as clean Markdown from the same URL browsers use for HTML:
+
+```bash
+curl -sI -H "Accept: text/markdown" https://docs.scottylabs.org/scottylabs/contributing/
+# Content-Type: text/markdown; charset=utf-8
+# Vary: Accept
+
+curl -s -H "Accept: text/markdown" https://docs.scottylabs.org/scottylabs/contributing/
+```
+
+At build time, the site exports a Markdown counterpart for every HTML page. Caddy on infra-01 negotiates `Accept: text/markdown` at the edge and serves the matching `.md` file from Garage.
 
 ## Architecture
 

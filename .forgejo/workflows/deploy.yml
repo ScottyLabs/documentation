@@ -74,6 +74,7 @@ jobs:
             --region us-east-1 \
             --delete \
             --exclude "*.html" \
+            --exclude "*.md" \
             --cache-control "public, max-age=31536000, immutable"
 
           nix shell nixpkgs#awscli2 --command aws s3 sync dist/ "s3://${GARAGE_BUCKET}/" \
@@ -82,4 +83,5 @@ jobs:
             --delete \
             --exclude "*" \
             --include "*.html" \
+            --include "*.md" \
             --cache-control "public, max-age=0, must-revalidate"

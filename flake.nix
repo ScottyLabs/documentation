@@ -88,7 +88,18 @@
               --endpoint-url "$GARAGE_ENDPOINT" \
               --region us-east-1 \
               --delete \
-              --cache-control "public, max-age=3600"
+              --exclude "*.html" \
+              --exclude "*.md" \
+              --cache-control "public, max-age=31536000, immutable"
+
+            ${pkgs.awscli2}/bin/aws s3 sync "$SITE/" "s3://$GARAGE_BUCKET/" \
+              --endpoint-url "$GARAGE_ENDPOINT" \
+              --region us-east-1 \
+              --delete \
+              --exclude "*" \
+              --include "*.html" \
+              --include "*.md" \
+              --cache-control "public, max-age=0, must-revalidate"
 
             echo "✅ Upload complete"
             echo "📦 Documentation available at https://docs.scottylabs.org"
