@@ -33,7 +33,7 @@ export async function generateNavigation(projects: Project[]): Promise<void> {
   const sidebar: (SidebarGroup | SidebarItem)[] = [
     {
       label: 'Welcome',
-      collapsed: false,
+      collapsed: true,
       items: [
         { label: 'Home', link: '/' },
         { label: 'Getting Started', link: '/getting-started/' },
@@ -78,12 +78,12 @@ async function generateProjectSection(project: Project): Promise<SidebarGroup | 
       return null;
     }
 
-    // autogenerate keeps nested pages in sync; collapsed: false keeps sections visible
-    // when viewing pages outside the project (e.g. Getting Started).
+    // autogenerate keeps nested pages in sync; collapsed: true keeps sections closed
+    // on first visit except for the group containing the current page.
     return {
       label: await sidebarGroupLabel(project),
-      autogenerate: { directory: project.slug, collapsed: false },
-      collapsed: false,
+      autogenerate: { directory: project.slug, collapsed: true },
+      collapsed: true,
     };
   }
 
@@ -110,7 +110,7 @@ async function generateProjectSection(project: Project): Promise<SidebarGroup | 
   return {
     label: project.name,
     items,
-    collapsed: false,
+    collapsed: true,
   };
 }
 
@@ -191,7 +191,6 @@ export default defineConfig({
       components: {
         MarkdownContent: './src/components/MarkdownContent.astro',
         Pagination: './src/components/Pagination.astro',
-        Sidebar: './src/components/Sidebar.astro',
       },
       sidebar: ${JSON.stringify(sidebar, null, 8).replace(/"([^"]+)":/g, '$1:')},
       head: [

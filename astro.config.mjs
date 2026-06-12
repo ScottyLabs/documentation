@@ -16,12 +16,11 @@ export default defineConfig({
       components: {
         MarkdownContent: './src/components/MarkdownContent.astro',
         Pagination: './src/components/Pagination.astro',
-        Sidebar: './src/components/Sidebar.astro',
       },
       sidebar: [
         {
                 label: "Welcome",
-                collapsed: false,
+                collapsed: true,
                 items: [
                         {
                                 label: "Home",
@@ -37,49 +36,49 @@ export default defineConfig({
                 label: "ScottyLabs",
                 autogenerate: {
                         directory: "scottylabs",
-                        collapsed: false
+                        collapsed: true
                 },
-                collapsed: false
+                collapsed: true
         },
         {
                 label: "Tartan Vote",
                 autogenerate: {
                         directory: "tartan-vote",
-                        collapsed: false
+                        collapsed: true
                 },
-                collapsed: false
+                collapsed: true
         },
         {
                 label: "Infrastructure",
                 autogenerate: {
                         directory: "infrastructure",
-                        collapsed: false
+                        collapsed: true
                 },
-                collapsed: false
+                collapsed: true
         },
         {
                 label: "Governance",
                 autogenerate: {
                         directory: "governance",
-                        collapsed: false
+                        collapsed: true
                 },
-                collapsed: false
+                collapsed: true
         },
         {
                 label: "Documentation Hub",
                 autogenerate: {
                         directory: "documentation",
-                        collapsed: false
+                        collapsed: true
                 },
-                collapsed: false
+                collapsed: true
         },
         {
                 label: "Courses",
                 autogenerate: {
                         directory: "courses",
-                        collapsed: false
+                        collapsed: true
                 },
-                collapsed: false
+                collapsed: true
         }
 ],
       head: [
