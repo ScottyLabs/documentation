@@ -12,7 +12,9 @@
   "dependencies": {
     "@astrojs/starlight": "^0.28.4",
     "@scalar/astro": "^0.2.0",
-    "astro": "^4.16.17"
+    "astro": "^4.16.17",
+    "astro-mermaid": "^2.0.2",
+    "mermaid": "^11.15.0"
   },
   "devDependencies": {
     "@types/bun": "^1.1.14",

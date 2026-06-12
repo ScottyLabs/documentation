@@ -83,4 +83,64 @@ import Default from '@astrojs/starlight/components/MarkdownContent.astro';
 
 	initHeadingLinks();
 	document.addEventListener('astro:page-load', initHeadingLinks);
+
+	const EXPAND_ICON =
+		'<svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M16 3h6v6h-2V5h-4V3zM2 3h6v2H4v4H2V3zm18 16v-4h2v6h-6v-2h4zM4 19h4v2H2v-6h2v4z"/></svg>';
+
+	function enhanceMermaidDiagrams() {
+		document
+			.querySelectorAll('.sl-markdown-content pre.mermaid[data-processed]')
+			.forEach((diagram) => {
+				if (diagram.querySelector('.sl-mermaid-fullscreen-btn')) {
+					return;
+				}
+
+				const button = document.createElement('button');
+				button.type = 'button';
+				button.className = 'sl-mermaid-fullscreen-btn';
+				button.innerHTML = EXPAND_ICON;
+				button.setAttribute('aria-label', 'View diagram fullscreen');
+				button.setAttribute('aria-pressed', 'false');
+				button.addEventListener('click', (event) => {
+					event.preventDefault();
+					if (document.fullscreenElement === diagram) {
+						void document.exitFullscreen();
+						return;
+					}
+					void diagram.requestFullscreen();
+				});
+
+				diagram.appendChild(button);
+			});
+	}
+
+	function syncMermaidFullscreenButtons() {
+		document.querySelectorAll('.sl-mermaid-fullscreen-btn').forEach((button) => {
+			const diagram = button.closest('pre.mermaid');
+			const active = document.fullscreenElement === diagram;
+			button.setAttribute('aria-pressed', active ? 'true' : 'false');
+			button.setAttribute('aria-label', active ? 'Exit fullscreen' : 'View diagram fullscreen');
+		});
+	}
+
+	function initMermaidFullscreen() {
+		enhanceMermaidDiagrams();
+		syncMermaidFullscreenButtons();
+	}
+
+	initMermaidFullscreen();
+	document.addEventListener('astro:page-load', initMermaidFullscreen);
+	document.addEventListener('fullscreenchange', syncMermaidFullscreenButtons);
+
+	const mermaidObserver = new MutationObserver(() => {
+		enhanceMermaidDiagrams();
+	});
+	document.querySelectorAll('.sl-markdown-content').forEach((content) => {
+		mermaidObserver.observe(content, {
+			childList: true,
+			subtree: true,
+			attributes: true,
+			attributeFilter: ['data-processed'],
+		});
+	});
 </script>

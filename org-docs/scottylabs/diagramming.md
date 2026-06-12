@@ -4,6 +4,8 @@ title: Diagramming
 
 ## Mermaid
 
+Use fenced ` ```mermaid ` blocks in markdown. Diagrams render in docs and include a fullscreen button (hover the diagram, or press Escape to exit).
+
 https://www.mermaidchart.com/play. Useful for very structured diagrams, such as database model.
 
 Examples:

@@ -175,10 +175,12 @@ async function sidebarGroupLabel(project: Project): Promise<string> {
 async function writeAstroConfig(sidebar: (SidebarGroup | SidebarItem)[]): Promise<void> {
   const config = `import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import mermaid from 'astro-mermaid';
 
 export default defineConfig({
   trailingSlash: 'always',
   integrations: [
+    mermaid({ autoTheme: true }),
     starlight({
       title: 'ScottyLabs Docs',
       description: 'Unified documentation for ScottyLabs projects',
@@ -204,6 +206,7 @@ export default defineConfig({
       customCss: [
         './src/styles/scalar-theme.css',
         './src/styles/heading-links.css',
+        './src/styles/mermaid.css',
       ],
     }),
   ],
