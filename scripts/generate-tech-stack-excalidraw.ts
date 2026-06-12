@@ -10,6 +10,13 @@ const OUTPUT_SRC = join(import.meta.dir, '../src/diagrams/tech-stack.excalidraw.
 const OUTPUT_PUBLIC = join(import.meta.dir, '../public/diagrams/tech-stack.excalidraw.json');
 const CODEBERG = 'https://codeberg.org/ScottyLabs';
 
+/** Vertical gap between stacked boxes */
+const ROW_GAP = 14;
+/** Default box height */
+const BOX_H = 40;
+/** Horizontal gap between grid columns */
+const COL_GAP = 16;
+
 type BoxOpts = {
   link?: string;
   metrics?: boolean;
@@ -55,9 +62,15 @@ function base(id: string) {
   };
 }
 
+function defaultBoxWidth(label: string, fontSize = 16): number {
+  const charWidth = fontSize * 0.58;
+  return Math.min(320, Math.max(168, Math.ceil(label.length * charWidth) + 28));
+}
+
 function box(x: number, y: number, label: string, opts: BoxOpts = {}): Box {
-  const w = opts.w ?? 168;
-  const h = opts.h ?? 40;
+  const fontSize = opts.fontSize ?? 16;
+  const w = opts.w ?? defaultBoxWidth(label, fontSize);
+  const h = opts.h ?? BOX_H;
   const rectId = uid('rect');
   const textId = uid('text');
   const stroke = opts.metrics ? '#c2410c' : '#1e1e1e';
@@ -202,14 +215,20 @@ function rightArrow(from: Box, to: Box, dashed = false) {
   arrowBetween(from.right, from.cy, to.x, to.cy, from, to, dashed);
 }
 
+function stackStep(h: number = BOX_H): number {
+  return h + ROW_GAP;
+}
+
 function note(x: number, y: number, text: string, w = 320) {
+  const lineCount = text.split('\n').length;
+  const height = Math.max(48, lineCount * 20 + 8);
   elements.push({
     ...base(uid('note')),
     type: 'text',
     x,
     y,
     width: w,
-    height: 80,
+    height: height,
     strokeColor: '#495057',
     backgroundColor: 'transparent',
     fillStyle: 'solid',
@@ -236,78 +255,106 @@ function repo(x: number, y: number, name: string, opts: BoxOpts = {}) {
 // --- Governance column ---
 
 const GOV_X = 40;
+const GOV_W = 200;
 let gy = 72;
 
-frame(GOV_X - 12, 40, 220, 660, 'Governance');
+const gov = repo(GOV_X, gy, 'governance', { w: GOV_W });
+gy += stackStep();
+const tofu = box(GOV_X, gy, 'OpenTofu · Atlantis', { w: GOV_W });
+gy += stackStep();
+box(GOV_X, gy, 'Keycloak · Forgejo · GitHub · …', { w: GOV_W, h: 52, fontSize: 13 });
+gy += stackStep(52);
+repo(GOV_X, gy, 'observability', { w: GOV_W });
+gy += stackStep();
+repo(GOV_X, gy, 'documentation', { w: GOV_W });
+gy += stackStep();
+repo(GOV_X, gy, 'infrastructure', { w: GOV_W });
+gy += stackStep();
+repo(GOV_X, gy, 'kennel', { w: GOV_W });
+gy += stackStep();
+repo(GOV_X, gy, 'devenv', { w: GOV_W });
+gy += stackStep();
+repo(GOV_X, gy, 'keycloak-theme', { w: GOV_W });
+gy += stackStep();
+const iaRepo = repo(GOV_X, gy, 'internet-archive', { w: GOV_W });
+gy = iaRepo.bottom + ROW_GAP + 4;
 
-const gov = repo(GOV_X, gy, 'governance', { w: 180 });
-gy += 52;
-const tofu = box(GOV_X, gy, 'OpenTofu · Atlantis', { w: 180 });
-gy += 52;
-box(GOV_X, gy, 'Keycloak · Forgejo · GitHub · …', { w: 180, h: 56, fontSize: 14 });
-gy += 68;
-const obsRepo = repo(GOV_X, gy, 'observability');
-gy += 48;
-const docsRepo = repo(GOV_X, gy, 'documentation');
-gy += 48;
-const infraRepo = repo(GOV_X, gy, 'infrastructure', { w: 180 });
-gy += 48;
-const kennelRepo = repo(GOV_X, gy, 'kennel');
-gy += 48;
-const devenvRepo = repo(GOV_X, gy, 'devenv');
-gy += 48;
-const keycloakThemeRepo = repo(GOV_X, gy, 'keycloak-theme', { w: 180 });
-gy += 48;
-const iaRepo = repo(GOV_X, gy, 'internet-archive', { w: 180 });
+const govNoteY = gy;
+note(
+  GOV_X,
+  govNoteY,
+  'Repos → hosts:\n• infrastructure → both NixOS columns\n• observability → Prometheus\n• documentation → docs site\n• kennel/devenv → kennel platform\n• internet-archive → batch job',
+  GOV_W,
+);
+const govFrameH = govNoteY + 6 * 20 + 32;
+frame(GOV_X - 12, 40, GOV_W + 24, govFrameH, 'Governance');
 
 downArrow(gov, tofu);
 
 // --- infra-01 ---
 
 const INFRA_X = 320;
-frame(INFRA_X - 12, 40, 720, 900, 'infra-01');
+const INFRA_COL_W = 200;
+const col = (index: number) => INFRA_X + index * (INFRA_COL_W + COL_GAP);
 
 let iy = 72;
-const tailInfra = box(INFRA_X, iy, 'Tailscale client', { w: 200 });
-const hostExpInfra = box(INFRA_X + 220, iy, 'Host exporters · node · systemd · cAdvisor · comin', {
-  w: 460,
-  h: 40,
-  fontSize: 14,
+const tailInfra = box(INFRA_X, iy, 'Tailscale client', { w: INFRA_COL_W });
+const hostExpInfra = box(INFRA_X + INFRA_COL_W + COL_GAP, iy, 'Host exporters · node · systemd · cAdvisor · comin', {
+  w: INFRA_COL_W * 2 + COL_GAP,
+  h: 44,
+  fontSize: 13,
 });
-iy += 56;
-const caddyPubInfra = box(INFRA_X, iy, 'Caddy · public', { w: 200, fill: '#e7f5ff' });
-iy += 56;
+iy += stackStep(44);
+const caddyPubInfra = box(INFRA_X, iy, 'Caddy · public', { w: INFRA_COL_W, fill: '#e7f5ff' });
+iy += stackStep();
 
 const svcY = iy;
-const col = (offset: number) => INFRA_X + offset;
-const idKeycloak = box(col(0), svcY, 'Keycloak · IdP*', { metrics: true });
-box(col(0), svcY + 48, 'OpenBao · native OIDC*', { metrics: true });
-box(col(0), svcY + 96, 'Vaultwarden');
+const svcRowYs = [svcY, svcY + stackStep(), svcY + stackStep() + stackStep(44), svcY + stackStep() + stackStep(44) + stackStep(40)];
 
-const docsHost = box(col(180), svcY + 48, 'docs site');
-box(col(180), svcY, 'Forgejo CI');
-box(col(180), svcY + 96, 'Matrix · Synapse*', { metrics: true });
+const idKeycloak = box(col(0), svcRowYs[0], 'Keycloak · IdP*', { w: INFRA_COL_W, metrics: true });
+box(col(0), svcRowYs[1], 'OpenBao · native OIDC*', { w: INFRA_COL_W, metrics: true });
+box(col(0), svcRowYs[2], 'Vaultwarden', { w: INFRA_COL_W });
 
-box(col(360), svcY, 'Garage*', { metrics: true });
-box(col(360), svcY + 48, 'Garage WebAdmin', { w: 168, h: 48, fontSize: 14 });
-box(col(360), svcY + 108, 'Caddy OIDC proxy', { w: 168, h: 36, fontSize: 13 });
+const docsHost = box(col(1), svcRowYs[1], 'docs site', { w: INFRA_COL_W });
+box(col(1), svcRowYs[0], 'Forgejo CI', { w: INFRA_COL_W });
+box(col(1), svcRowYs[2], 'Matrix · Synapse*', { w: INFRA_COL_W, metrics: true });
 
-const obsY = svcY + 168;
-box(col(0), obsY, 'Grafana · native OIDC*', { metrics: true });
-const promScraper = box(col(0), obsY + 48, 'Prometheus scraper*', { metrics: true, w: 180 });
-box(col(0), obsY + 96, 'Loki* · Tempo* · Uptime Kuma*', { metrics: true, w: 180, h: 40, fontSize: 14 });
+box(col(2), svcRowYs[0], 'Garage*', { w: INFRA_COL_W, metrics: true });
+box(col(2), svcRowYs[1], 'Garage WebAdmin', { w: INFRA_COL_W, h: 44, fontSize: 13 });
+box(col(2), svcRowYs[2], 'Caddy OIDC proxy', { w: INFRA_COL_W, h: 40, fontSize: 13 });
 
-box(col(180), obsY, 'LiteLLM · native OIDC*', { metrics: true });
-box(col(180), obsY + 48, 'cli-proxy-api');
+const obsY = svcRowYs[3] + ROW_GAP + 8;
+box(col(0), obsY, 'Grafana · native OIDC*', { w: INFRA_COL_W, metrics: true });
+const promScraper = box(col(0), obsY + stackStep(), 'Prometheus scraper*', {
+  w: INFRA_COL_W,
+  metrics: true,
+});
+box(col(0), obsY + stackStep() * 2, 'Loki · Tempo · Uptime Kuma*', {
+  w: INFRA_COL_W,
+  h: 44,
+  fontSize: 13,
+  metrics: true,
+});
 
-box(col(360), obsY, 'Headplane · native OIDC');
-box(col(360), obsY + 48, 'Headscale server*', { metrics: true });
+box(col(1), obsY, 'LiteLLM · native OIDC*', { w: INFRA_COL_W, metrics: true });
+box(col(1), obsY + stackStep(), 'cli-proxy-api', { w: INFRA_COL_W });
 
-iy = svcY + 300;
-note(INFRA_X, iy, 'Public: Caddy → service\nTailnet: Tailscale → Caddy · tailnet → pgAdmin', 280);
+box(col(2), obsY, 'Headplane · native OIDC', { w: INFRA_COL_W });
+box(col(2), obsY + stackStep(), 'Headscale server*', { w: INFRA_COL_W, metrics: true });
 
-const tailCaddyInfra = box(INFRA_X + 300, iy + 8, 'Caddy · tailnet', { w: 160, fill: '#fff3bf' });
-const pgInfra = box(INFRA_X + 300, iy + 60, 'pgAdmin', { w: 160 });
+const infraNoteY = obsY + stackStep() * 2 + stackStep(44) + ROW_GAP;
+note(INFRA_X, infraNoteY, 'Public: Caddy → service\nTailnet: Tailscale → Caddy · tailnet → pgAdmin', 280);
+
+const tailCaddyInfra = box(INFRA_X + INFRA_COL_W + COL_GAP + 40, infraNoteY + 4, 'Caddy · tailnet', {
+  w: 168,
+  fill: '#fff3bf',
+});
+const pgInfra = box(INFRA_X + INFRA_COL_W + COL_GAP + 40, infraNoteY + stackStep(), 'pgAdmin', {
+  w: 168,
+});
+
+const infraFrameH = pgInfra.bottom - 40 + 24;
+frame(INFRA_X - 12, 40, INFRA_COL_W * 3 + COL_GAP * 2 + 24, infraFrameH, 'infra-01');
 
 downArrow(tailInfra, tailCaddyInfra);
 downArrow(tailCaddyInfra, pgInfra);
@@ -316,21 +363,22 @@ downArrow(caddyPubInfra, idKeycloak);
 // --- deploy-01 ---
 
 const DEP_X = 1080;
-frame(DEP_X - 12, 40, 680, 900, 'deploy-01');
+const DEP_COL_W = 158;
+const DEP_GRID_COLS = 4;
 
 let dy = 72;
 const tailDeploy = box(DEP_X, dy, 'Tailscale client', { w: 200 });
 const hostExpDeploy = box(DEP_X + 220, dy, 'Host exporters · node · systemd · cAdvisor · comin', {
-  w: 420,
-  h: 40,
-  fontSize: 14,
+  w: DEP_COL_W * DEP_GRID_COLS + COL_GAP * (DEP_GRID_COLS - 1),
+  h: 44,
+  fontSize: 13,
 });
-dy += 56;
+dy += stackStep(44);
 const caddyDeploy = box(DEP_X, dy, 'Caddy · public', { w: 200, fill: '#e7f5ff' });
-dy += 56;
+dy += stackStep();
 
-const kennelSvc = box(DEP_X, dy, 'kennel · platform*', { metrics: true, w: 180, fill: '#fff0f6' });
-dy += 52;
+const kennelSvc = box(DEP_X, dy, 'kennel · platform*', { metrics: true, w: 200, fill: '#fff0f6' });
+dy += stackStep();
 
 const kennelRepos: [string, string][] = [
   ['kennel docs', 'kennel'],
@@ -348,35 +396,48 @@ const kennelRepos: [string, string][] = [
   ['components', 'components'],
 ];
 
+const GRID_BOX_H = 38;
 let kx = DEP_X;
 let ky = dy;
+let gridCol = 0;
 for (const [label, slug] of kennelRepos) {
-  repo(kx, ky, label, { link: `${CODEBERG}/${slug}`, w: 150, h: 36, fontSize: 14 });
-  kx += 158;
-  if (kx > DEP_X + 480) {
+  repo(kx, ky, label, {
+    link: `${CODEBERG}/${slug}`,
+    w: DEP_COL_W,
+    h: GRID_BOX_H,
+    fontSize: 13,
+  });
+  gridCol += 1;
+  if (gridCol >= DEP_GRID_COLS) {
+    gridCol = 0;
     kx = DEP_X;
-    ky += 44;
+    ky += stackStep(GRID_BOX_H);
+  } else {
+    kx += DEP_COL_W + COL_GAP;
   }
 }
+const gridBottom = ky + GRID_BOX_H;
 
 downArrow(caddyDeploy, kennelSvc);
 
-const tailCaddyDeploy = box(DEP_X + 500, dy, 'Caddy · tailnet', { w: 150, fill: '#fff3bf' });
-const pgDeploy = box(DEP_X + 500, dy + 52, 'pgAdmin', { w: 150 });
-const iaBatch = box(DEP_X + 500, dy + 120, 'internet-archive · batch job', { w: 150, h: 48, fontSize: 13 });
+const rightColX = DEP_X + DEP_COL_W * DEP_GRID_COLS + COL_GAP * (DEP_GRID_COLS - 1) + 24;
+const rightColY = gridBottom + ROW_GAP + 8;
+const tailCaddyDeploy = box(rightColX, rightColY, 'Caddy · tailnet', { w: 168, fill: '#fff3bf' });
+const pgDeploy = box(rightColX, rightColY + stackStep(), 'pgAdmin', { w: 168 });
+const iaBatch = box(rightColX, rightColY + stackStep() * 2, 'internet-archive · batch job', {
+  w: 168,
+  h: 44,
+  fontSize: 12,
+});
+
+const depFrameH = iaBatch.bottom - 40 + 24;
+frame(DEP_X - 12, 40, rightColX + 168 - DEP_X + 24, depFrameH, 'deploy-01');
 
 downArrow(tailDeploy, tailCaddyDeploy);
 downArrow(tailCaddyDeploy, pgDeploy);
 
 // Short in-host links only (long cross-column arrows blow up Excalidraw's canvas).
 rightArrow(promScraper, hostExpInfra, true);
-
-note(
-  GOV_X,
-  gy + 12,
-  'Repos → hosts: infrastructure configures both NixOS columns; observability → Prometheus; documentation → docs site; kennel/devenv → kennel platform; internet-archive → batch job.',
-  220,
-);
 
 await mkdir(join(import.meta.dir, '../src/diagrams'), { recursive: true });
 await mkdir(join(import.meta.dir, '../public/diagrams'), { recursive: true });
