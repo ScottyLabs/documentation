@@ -1,0 +1,31 @@
+# Copy to any project repo: .forgejo/workflows/trigger-docs-diagrams.yml
+# Requires DOCS_TRIGGER_TOKEN secret (see .forgejo/README.md).
+
+name: Trigger Documentation Diagram Rebuild
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/diagrams/**'
+      - 'diagrams/**'
+      - 'scripts/generate-*-excalidraw.ts'
+
+jobs:
+  trigger-docs:
+    runs-on: docker
+    steps:
+      - name: Notify documentation hub of diagram changes
+        env:
+          DOCS_TRIGGER_TOKEN: ${{ secrets.DOCS_TRIGGER_TOKEN }}
+        run: |
+          set -euo pipefail
+          echo "🔔 Triggering documentation diagram rebuild..."
+          curl -fsS -X POST \
+            -H "Authorization: token ${DOCS_TRIGGER_TOKEN}" \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            https://codeberg.org/api/v1/repos/scottylabs/documentation/dispatches \
+            -d '{"event_type": "diagrams-updated"}'
+          echo "✅ Documentation rebuild triggered"

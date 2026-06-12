@@ -7,9 +7,11 @@ import { parseManifest, externalProjects, isDocumentationHubProject } from './ma
 import { cloneGovernance, discoverProjectsFromGovernance, mergeProjects } from './governance.ts';
 import { resolveAllRepoRoots, cleanRepos } from './clone-repos.ts';
 import { aggregateStarlightDocs, cleanDocs } from './aggregate-docs.ts';
+import { cleanAggregatedDiagrams } from './aggregate-excalidraw.ts';
 import { processOpenApiProjects, cleanOpenApiSpecs } from './scalar-integration.ts';
 import { buildRustDocs, cleanRustDocs } from './rustdoc.ts';
 import { generateNavigation } from './generate-nav.ts';
+import { regenerateExcalidraw } from './regenerate-excalidraw.ts';
 
 const MANIFEST_PATH = 'projects.toml';
 
@@ -73,6 +75,8 @@ async function build() {
 
     // Always regenerate astro.config.mjs so the sidebar matches discovered projects.
     await generateNavigation(allProjects);
+
+    await regenerateExcalidraw(allProjects);
     
     const duration = ((Date.now() - startTime) / 1000).toFixed(2);
     console.log(`✨ Build prep completed in ${duration}s\n`);
@@ -93,6 +97,7 @@ async function clean() {
   await cleanDocs();
   await cleanOpenApiSpecs();
   await cleanRustDocs();
+  await cleanAggregatedDiagrams();
   
   console.log('\n✅ Clean completed\n');
 }

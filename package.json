@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "bun run scripts/build.ts && astro dev",
     "start": "bun run scripts/build.ts && astro dev",
-    "build": "bun run scripts/build.ts && bun run scripts/generate-tech-stack-excalidraw.ts && astro build && bun run scripts/write-redirects.ts && bun run scripts/export-markdown.ts && bun run scripts/verify-accept-markdown.ts",
+    "build": "bun run scripts/build.ts && astro build && bun run scripts/write-redirects.ts && bun run scripts/export-markdown.ts && bun run scripts/verify-accept-markdown.ts",
     "generate:tech-stack-diagram": "bun run scripts/generate-tech-stack-excalidraw.ts",
     "preview": "astro preview",
     "astro": "astro"

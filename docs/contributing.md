@@ -22,6 +22,12 @@ Enable the repo in governance (included by default). Use `docs = false` to opt o
 
 Published pages are readable by AI agents via [Accept Markdown](https://acceptmarkdown.com/) — request any docs URL with `Accept: text/markdown` to receive Markdown from the same URL browsers use for HTML.
 
+### Excalidraw diagrams
+
+Place `.excalidraw.json` files in `docs/diagrams/` in your repo. They are published at `/diagrams/{your-project-slug}/` and can be embedded with the hub’s `ExcalidrawDiagram` component (see [Diagramming](/scottylabs/design/diagramming/)).
+
+Pushes that change `docs/diagrams/`, `diagrams/`, or `scripts/generate-*-excalidraw.ts` should trigger a docs rebuild — use the org webhook on infra-01 or copy [`.forgejo/examples/trigger-docs-diagrams.yml`](https://codeberg.org/ScottyLabs/documentation/src/branch/main/.forgejo/examples/trigger-docs-diagrams.yml) into `.forgejo/workflows/` with the `DOCS_TRIGGER_TOKEN` secret.
+
 ## Local development
 
 Run `bun run dev`; it fetches docs from source repos before starting the dev server. In a monorepo checkout, sibling repos (e.g. `../infrastructure`) are used automatically.

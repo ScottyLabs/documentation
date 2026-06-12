@@ -94,7 +94,7 @@ flowchart TB
 
 ## Automatic Updates
 
-The documentation hub automatically rebuilds when governance changes. See [`GOVERNANCE_INTEGRATION.md`](GOVERNANCE_INTEGRATION.md) for setup instructions.
+The documentation hub automatically rebuilds when governance changes. See [`.forgejo/README.md`](.forgejo/README.md) for setup instructions.
 
 **What triggers a rebuild:**
 - Changes to `data/` in the governance repository
@@ -103,7 +103,7 @@ The documentation hub automatically rebuilds when governance changes. See [`GOVE
 
 **Setup required in governance repository:**
 1. Add access token secret: `DOCS_TRIGGER_TOKEN`
-2. Add workflow file: `.forgejo/workflows/trigger-docs-rebuild.yml` (see [`governance-workflow-example.yml`](governance-workflow-example.yml))
+2. Add workflow file: `.forgejo/workflows/trigger-docs-rebuild.yml` (see [`.forgejo/examples/trigger-docs-rebuild.yml`](.forgejo/examples/trigger-docs-rebuild.yml))
 
 Once configured, any change to governance (adding/removing `docs = true` flags, updating descriptions, etc.) will automatically trigger a documentation rebuild and deployment.
 
@@ -249,8 +249,14 @@ documentation/
 ├── projects.toml          # Project manifest
 ├── flake.nix              # Nix development environment
 ├── .forgejo/
-│   └── workflows/
-│       └── deploy.yml     # CI/CD pipeline
+│   ├── README.md          # Forgejo integration (governance + diagram triggers)
+│   ├── workflows/
+│   │   └── deploy.yml     # CI/CD pipeline
+│   ├── examples/
+│   │   ├── trigger-docs-rebuild.yml    # Copy to governance repo
+│   │   └── trigger-docs-diagrams.yml   # Copy to project repos
+│   └── scripts/
+│       └── dispatch-rebuild.sh
 ├── scripts/
 │   ├── build.ts           # Main build orchestrator
 │   ├── manifest.ts        # TOML parsing
@@ -282,17 +288,17 @@ The documentation hub rebuilds automatically on:
 
 ### Governance Integration
 
-To enable automatic rebuilds when governance changes, add the trigger workflow to the governance repository. See [`GOVERNANCE_INTEGRATION.md`](GOVERNANCE_INTEGRATION.md) for complete setup instructions.
+To enable automatic rebuilds when governance changes, add the trigger workflow to the governance repository. See [`.forgejo/README.md`](.forgejo/README.md) for complete setup instructions.
 
 **Quick setup:**
 ```bash
 # In governance repository
 mkdir -p .forgejo/workflows
-cp /path/to/documentation/governance-workflow-example.yml \
+cp /path/to/documentation/.forgejo/examples/trigger-docs-rebuild.yml \
    .forgejo/workflows/trigger-docs-rebuild.yml
 
 # Add secret DOCS_TRIGGER_TOKEN to governance repo
-# (see GOVERNANCE_INTEGRATION.md for details)
+# (see .forgejo/README.md for details)
 ```
 
 ### Forgejo Actions
