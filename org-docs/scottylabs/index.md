@@ -17,7 +17,7 @@ For a less technical introduction to ScottyLabs, check out the [ScottyLabs websi
 
 ## Getting access
 
-New contributors should complete [Codeberg Setup](/scottylabs/onboarding/codeberg-setup/) before cloning repos, then follow [Contributing](/scottylabs/onboarding/contributing/) to join a team in Governance.
+New contributors should [sign up on Codeberg](/scottylabs/onboarding/codeberg-setup/), then follow [Contributing](/scottylabs/onboarding/contributing/) to join a team in Governance.
 
 ## Do you have any questions?
 

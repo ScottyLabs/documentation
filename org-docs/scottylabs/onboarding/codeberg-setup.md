@@ -2,106 +2,66 @@
 title: Codeberg Setup
 ---
 
-This guide walks you through registering on Codeberg and configuring SSH so you can clone and push to ScottyLabs repositories. It should take about 3–5 minutes.
+[Sign up on codeberg.org](https://codeberg.org/user/sign_up).
 
-If you only need GitHub access, skip steps 1 and 3; complete step 3.5 instead.
+Use the **same username and email** as your GitHub account. That is all you really need to do in this document.
 
-## 1. Register a Codeberg account
+## Extra steps
 
-Go to [codeberg.org/user/sign_up](https://codeberg.org/user/sign_up) and create an account.
+To clone and push ScottyLabs repos you need SSH. Verified commits are optional. See [Commit signing (optional)](#commit-signing-optional) if you want them.
 
-Use the **same username and email** as your GitHub account. Follow the registration flow until you are signed in.
+### SSH setup
 
-## 2. Generate an SSH key
+SSH is how Git proves you are you when you clone and push. You make a key pair on your laptop, paste the **public** key into Codeberg, and keep the private key on your machine.
 
-Open a terminal and run:
+1. **Create a key** (replace the email with yours):
 
-```bash
-ssh-keygen -t ed25519 -C "<email>"
-```
+   ```bash
+   ssh-keygen -t ed25519 -C "your@email"
+   ```
 
-Replace `<email>` with the email you use for Codeberg and GitHub.
+   Press Enter to accept the default path (`~/.ssh/id_ed25519`). Set a passphrase when prompted.
 
-When prompted for a file location, press Enter to accept the default (`~/.ssh/id_ed25519`). The rest of this guide assumes you used the default path.
+2. **Copy the public key:**
 
-Set a passphrase when prompted. Do not leave it blank.
+   ```bash
+   cat ~/.ssh/id_ed25519.pub
+   ```
 
-If you already created the key without a passphrase, add one with:
+   Copy the whole line (`ssh-ed25519 …`).
 
-```bash
-ssh-keygen -p -f ~/.ssh/id_ed25519
-```
+3. **Add it on Codeberg:** open [SSH / GPG keys](https://codeberg.org/user/settings/keys), click **Add key**, paste, save.
 
-Display your public key:
+4. **Test it:**
 
-```bash
-cat ~/.ssh/id_ed25519.pub
-```
+   ```bash
+   ssh -T git@codeberg.org
+   ```
 
-It should look like `ssh-ed25519 <hash> <your-email>`. Copy the entire line.
+   You should see a message with your username, not `Permission denied`.
 
-## 3. Add the key to Codeberg
+If `ssh-add` complains later, run `ssh-add ~/.ssh/id_ed25519` and enter your passphrase.
 
-1. Open [SSH / GPG keys](https://codeberg.org/user/settings/keys) in your Codeberg settings.
-2. Click **Add key**.
-3. Enter a name (for example, `ScottyLabs laptop`) and paste your public key.
-4. Click **Add key**.
+**(Optional) GitHub:** add the same public key at [GitHub SSH and GPG keys](https://github.com/settings/keys) if you push there too.
 
-## 3.5. (Optional but recommended) Add the key to GitHub
+### Commit signing (optional)
 
-1. Open [GitHub SSH and GPG keys](https://github.com/settings/keys).
-2. Click **New SSH key**.
-3. Add the same public key twice:
-   - Once as a **Signing key**
-   - Once as an **Authentication key**
+Add your public key under [SSH / GPG keys](https://codeberg.org/user/settings/keys) on Codeberg and click **Verify** to prove ownership.
 
-GitHub historically required separate key types for signing and authentication; use the same public key for both.
-
-## 3.6. Add the key to your local SSH agent
-
-Run:
+**SSH signing** (Git 2.34+). You can use your auth key or a separate signing-only key:
 
 ```bash
-eval "$(ssh-agent -s)"
+git config --global gpg.format ssh
+git config --global user.signingKey '~/.ssh/id_ed25519.pub'
+git config --global commit.gpgSign true
 ```
 
-You should see `Agent pid <number>`. If the command is unsupported, restart your terminal and continue.
-
-Load your key:
+**GPG signing:**
 
 ```bash
-ssh-add ~/.ssh/id_ed25519
+git config --global user.signingkey <key-id>
+git config --global commit.gpgSign true
 ```
-
-Enter your passphrase when prompted.
-
-## 4. Test authentication
-
-Test Codeberg:
-
-```bash
-ssh -T git@codeberg.org
-```
-
-Expected output is similar to:
-
-```text
-Hi there, <username>! You've successfully authenticated with the key named <key name>, but Forgejo does not provide shell access.
-```
-
-If you completed steps 3.5 and 3.6, test GitHub as well:
-
-```bash
-ssh -T git@github.com
-```
-
-Expected output is similar to:
-
-```text
-Hi <username>! You've successfully authenticated, but GitHub does not provide shell access.
-```
-
-If either command returns **permission denied**, ask a tech lead or someone in DevOps for help.
 
 ## Next steps
 
