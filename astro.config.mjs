@@ -5,7 +5,22 @@ import mermaid from 'astro-mermaid';
 export default defineConfig({
   trailingSlash: 'always',
   integrations: [
-    mermaid({ autoTheme: true, mermaidConfig: { securityLevel: 'loose' } }),
+    mermaid({
+      autoTheme: true,
+      mermaidConfig: {
+        securityLevel: 'loose',
+        flowchart: {
+          useMaxWidth: false,
+          htmlLabels: true,
+          nodeSpacing: 28,
+          rankSpacing: 40,
+          padding: 12,
+        },
+        themeVariables: {
+          fontSize: '17px',
+        },
+      },
+    }),
     starlight({
       title: 'ScottyLabs Docs',
       description: 'Unified documentation for ScottyLabs projects',
