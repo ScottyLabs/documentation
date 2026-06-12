@@ -4,7 +4,7 @@ title: Tech Stack
 
 ScottyLabs platform overview. **Click any repo node** to open it on Codeberg. Scroll horizontally if needed, or use the diagram fullscreen button to zoom.
 
-The platform diagram reads left to right: **repos & governance**, then **infra-01** and **deploy-01**. Each host is top-down: **Caddy → service → nested components** (for example **Caddy → kennel →** deployed repos on deploy-01). Cross-host links (Forgejo webhooks, Kennel Caddy admin API) are described in prose below the diagram. **Keycloak** is the org IdP; see [Authentication](#authentication) for how Caddy OIDC proxy vs native OIDC differ.
+The platform diagram reads left to right: **governance**, then each **NixOS host**. On every host, **Tailscale** (Headscale client) and **host exporters** run alongside **Caddy**. Public web traffic hits **Caddy first**; tailnet-only services like pgAdmin use **Headscale → Caddy → app** (the reverse order from the [Caddy OIDC proxy](#caddy-oidc-proxy) pattern). Services marked **\*** export Prometheus metrics scraped by the Prometheus server on infra-01. Cross-host links are described in prose below the diagram.
 
 Sources: [governance](https://codeberg.org/ScottyLabs/governance) team data, [infrastructure](https://codeberg.org/ScottyLabs/infrastructure) NixOS hosts, and this monorepo checkout.
 
@@ -32,105 +32,115 @@ flowchart LR
 
   subgraph col_infra01 ["infra-01"]
     direction TB
-    caddy_infra["Caddy"]
-    subgraph infra_chains ["Services"]
-      direction LR
-      subgraph chain_id ["Identity & access"]
-        direction TB
-        keycloak["Keycloak · IdP"]
-        openbao["OpenBao · native OIDC"]
-        vaultwarden["Vaultwarden"]
-        headplane["Headplane · native OIDC"]
-        headscale["Headscale · native OIDC"]
-        headplane --> headscale
-      end
-      subgraph chain_plat ["Storage & CI"]
-        direction TB
-        forgejo_ci["Forgejo CI"]
-        docs_host["docs site"]
-        matrix["Matrix"]
-      end
-      subgraph chain_garage ["Garage S3"]
-        direction TB
-        garage_s3["Garage"]
-        garage_webadmin["Garage WebAdmin · Caddy OIDC proxy"]
-        garage_s3 --> garage_webadmin
-      end
-      subgraph chain_obs ["Observability"]
-        direction TB
-        grafana["Grafana · native OIDC"]
-        prometheus["Prometheus"]
-        loki["Loki"]
-        tempo["Tempo"]
-        uptime["Uptime Kuma"]
-        grafana --> prometheus
-      end
-      subgraph chain_ai ["AI gateway"]
-        direction TB
-        litellm["LiteLLM · native OIDC"]
-        cli_proxy["cli-proxy-api"]
-        litellm --> cli_proxy
-      end
+    tailscale_infra["Tailscale client"]
+    host_exp_infra["Host exporters · node · systemd · cAdvisor · comin"]
+    caddy_infra["Caddy · public"]
+    subgraph chain_id ["Identity & access"]
+      direction TB
+      keycloak["Keycloak · IdP*"]
+      openbao["OpenBao · native OIDC*"]
+      vaultwarden["Vaultwarden"]
     end
-    caddy_infra --> infra_chains
+    subgraph chain_tailnet ["Tailnet control · infra-01 only"]
+      direction TB
+      headplane["Headplane · native OIDC"]
+      headscale_srv["Headscale server*"]
+      headplane --> headscale_srv
+    end
+    subgraph chain_plat ["Storage & CI"]
+      direction TB
+      forgejo_ci["Forgejo CI"]
+      docs_host["docs site"]
+      matrix["Matrix · Synapse*"]
+    end
+    subgraph chain_garage ["Garage S3"]
+      direction TB
+      garage_s3["Garage*"]
+      garage_webadmin["Garage WebAdmin · Caddy OIDC proxy"]
+      garage_s3 --> garage_webadmin
+    end
+    subgraph chain_obs ["Observability · infra-01"]
+      direction TB
+      grafana["Grafana · native OIDC*"]
+      prom_scraper["Prometheus scraper*"]
+      loki["Loki*"]
+      tempo["Tempo*"]
+      uptime["Uptime Kuma*"]
+      grafana --> prom_scraper
+    end
+    subgraph chain_ai ["AI gateway"]
+      direction TB
+      litellm["LiteLLM · native OIDC*"]
+      cli_proxy["cli-proxy-api"]
+      litellm --> cli_proxy
+    end
+    caddy_tail_infra["Caddy · tailnet"]
+    pgadmin_infra["pgAdmin"]
+    caddy_tail_infra --> pgadmin_infra
+    tailscale_infra --> caddy_tail_infra
+    caddy_infra --> chain_id
+    caddy_infra --> chain_tailnet
+    caddy_infra --> chain_plat
+    caddy_infra --> chain_garage
+    caddy_infra --> chain_obs
+    caddy_infra --> chain_ai
   end
 
   subgraph col_deploy01 ["deploy-01"]
-    direction LR
-    subgraph deploy_web [" "]
-      direction TB
-      caddy_deploy["Caddy"]
-        subgraph kennel_apps ["Kennel deployments"]
-          direction LR
-          subgraph team_courses ["CMU Courses · Quest"]
-            direction TB
-            kennel_docs["kennel docs"]
-            courses["courses"]
-            quest["quest"]
-          end
-          subgraph team_housing ["CMU Housing"]
-            direction TB
-            housing["housing"]
-          end
-          subgraph team_vote ["Tartan Vote"]
-            direction TB
-            tartan_vote["tartan-vote"]
-          end
-          subgraph team_cbp ["CBP"]
-            direction TB
-            bus_sign["bus-sign"]
-            dalmatian["dalmatian"]
-            discord_verify["discord-verify"]
-          end
-          subgraph team_slai ["SLAI"]
-            direction TB
-            cmugpt_surface["cmugpt-surface"]
-            cmugpt_agent["cmugpt-agent"]
-            mcp_server["mcp-server"]
-            sms_surface["sms-surface"]
-          end
-          subgraph team_uia ["UI Architecture"]
-            direction TB
-            components["components"]
-          end
+    direction TB
+    tailscale_deploy["Tailscale client"]
+    host_exp_deploy["Host exporters · node · systemd · cAdvisor · comin"]
+    caddy_deploy["Caddy · public"]
+    caddy_tail_deploy["Caddy · tailnet"]
+    pgadmin_deploy["pgAdmin"]
+    caddy_tail_deploy --> pgadmin_deploy
+    tailscale_deploy --> caddy_tail_deploy
+    subgraph kennel ["kennel"]
+      direction LR
+      kennel_svc["kennel · platform*"]
+      subgraph team_courses ["CMU Courses · Quest"]
+        direction TB
+        kennel_docs["kennel docs"]
+        courses["courses"]
+        quest["quest"]
       end
-      caddy_deploy --> kennel
+      housing["housing"]
+      tartan_vote["tartan-vote"]
+      subgraph team_cbp ["CBP"]
+        direction TB
+        bus_sign["bus-sign"]
+        dalmatian["dalmatian"]
+        discord_verify["discord-verify"]
+      end
+      subgraph team_slai ["SLAI"]
+        direction TB
+        cmugpt_surface["cmugpt-surface"]
+        cmugpt_agent["cmugpt-agent"]
+        mcp_server["mcp-server"]
+        sms_surface["sms-surface"]
+      end
+      components["components"]
+      kennel_svc --> kennel_docs
     end
-    subgraph chain_jobs ["Host jobs"]
-      direction TB
-      ia_batch["internet-archive · batch job"]
-    end
+    ia_batch["internet-archive · batch job"]
+    caddy_deploy --> kennel_svc
   end
 
   infra_repo --> col_infra01
   infra_repo --> col_deploy01
 
-  observability_repo -.-> chain_obs
+  prom_scraper -.-> host_exp_infra
+  prom_scraper -.-> host_exp_deploy
+
+  observability_repo -.-> prom_scraper
   documentation_repo -.-> docs_host
   keycloak_theme -.-> keycloak
-  kennel_repo -.-> kennel
-  devenv_repo -.-> kennel
+  kennel_repo -.-> kennel_svc
+  devenv_repo -.-> kennel_svc
   internet_archive -.-> ia_batch
+
+  classDef metrics stroke:#c2410c,stroke-width:3px
+  class keycloak,openbao,matrix,garage_s3,grafana,prom_scraper,loki,tempo,uptime,litellm,headscale_srv,kennel_svc metrics
 
   click gov_repo "https://codeberg.org/ScottyLabs/governance" "governance"
   click infra_repo "https://codeberg.org/ScottyLabs/infrastructure" "infrastructure"
@@ -154,7 +164,11 @@ flowchart LR
   click components "https://codeberg.org/ScottyLabs/components" "components"
 ```
 
-Forgejo CI on infra-01 sends deploy webhooks to kennel on deploy-01. Kennel registers app routes on deploy-01 Caddy via the admin API.
+**Diagram key:** orange border or `*` = Prometheus service metrics. **Host exporters** (node, systemd, cAdvisor, comin) run on every NixOS host; the **Prometheus scraper** on infra-01 collects them along with service metrics.
+
+**Tailscale on every host:** each VM runs a Tailscale client registered with the Headscale server on infra-01. **Headplane** (admin UI) runs only on infra-01. **pgAdmin** is tailnet-only (`:5050` on `tailscale0`); reach it via **Headscale → Caddy → pgAdmin**, not from the public internet.
+
+Forgejo CI on infra-01 sends deploy webhooks to kennel on deploy-01. Kennel registers app routes on deploy-01 Caddy via the admin API. **Keycloak** is the org IdP; see [Authentication](#authentication).
 
 ## Authentication
 
@@ -172,7 +186,7 @@ Example: **Garage WebAdmin** (`garage.scottylabs.org`) — static UI with no OID
 
 ### Native OIDC
 
-For apps that **speak OIDC themselves**, Caddy is a plain reverse proxy. The browser talks to the app; the app redirects to Keycloak and completes the OAuth flow on its own.
+For apps that **speak OIDC themselves**, Caddy is a plain reverse proxy on the public web path. The browser talks to the app; the app redirects to Keycloak and completes the OAuth flow on its own.
 
 ```text
 Browser → Caddy → app ⇄ Keycloak
@@ -183,12 +197,20 @@ Examples on infra-01:
 | Service | Caddy route | App-side auth |
 | ------- | ----------- | ------------- |
 | OpenBao | `secrets2.scottylabs.org` → `:8200` | JWT auth backend + Keycloak (via OpenTofu `tofu/identity`) |
-| Headscale | `headscale.scottylabs.org` → Headscale API | OIDC in Headscale (`client_id: headscale`) |
+| Headscale server | `headscale.scottylabs.org` → Headscale API | OIDC in Headscale (`client_id: headscale`) |
 | Headplane | `headplane.scottylabs.org` → Headplane UI | OIDC in Headplane (`client_id: headplane`); admin UI for Headscale |
 | Grafana | `grafana.scottylabs.org` → Grafana | `generic_oauth` to Keycloak |
 | LiteLLM | `litellm.scottylabs.org` → LiteLLM | Generic OIDC SSO (`GENERIC_*` env) |
 
-OpenBao, Headscale, and Headplane all use this pattern: **Caddy → app**, with the app redirecting to Keycloak when login is required. None of them are `Caddy → Keycloak → app`.
+### Tailnet-first (Headscale before Caddy)
+
+Some services are not on the public internet. Every NixOS host runs a **Tailscale client** joined to the org Headscale server (infra-01 only). For tailnet-only admin tools, you connect over Headscale **first**, then Caddy, then the app — the opposite order from the Caddy OIDC proxy pattern:
+
+```text
+Admin → Headscale (Tailscale) → Caddy → pgAdmin
+```
+
+**pgAdmin** listens on `:5050` on the `tailscale0` interface on hosts with PostgreSQL (infra-01, deploy-01). Public Caddy routes do not expose it.
 
 ## Application repos
 
@@ -196,9 +218,12 @@ Kennel builds and deploys repos marked `kennel = true` in governance. Those depl
 
 ## Prometheus exporters
 
-Grafana queries **Prometheus** on infra-01. Every service with a Grafana dashboard exposes metrics through one of the scrape jobs below (defined in [`infrastructure/hosts/infra-01/observability.nix`](https://codeberg.org/ScottyLabs/infrastructure/src/branch/main/hosts/infra-01/observability.nix)). Dashboards and alerts live in [observability](https://codeberg.org/ScottyLabs/observability).
+Grafana on infra-01 queries the **Prometheus scraper** there. Metrics come from two layers:
 
-### Host agents (all NixOS hosts)
+1. **Host exporters** on every NixOS host (infra-01, deploy-01, snoopy, bus-sign-display) — node, systemd, cAdvisor, and comin metrics. These appear as **Host exporters** nodes in the platform diagram.
+2. **Service metrics** on individual platform services — marked with **\*** or an orange border in the diagram. Scraped by Prometheus on infra-01 (see [`observability.nix`](https://codeberg.org/ScottyLabs/infrastructure/src/branch/main/hosts/infra-01/observability.nix)). Dashboards and alerts live in [observability](https://codeberg.org/ScottyLabs/observability).
+
+### Host exporters (every NixOS host)
 
 | Scrape job | Exporter | Port | Hosts |
 | ---------- | -------- | ---- | ----- |
@@ -209,11 +234,11 @@ Grafana queries **Prometheus** on infra-01. Every service with a Grafana dashboa
 
 `systemd_exporter` whitelists: kennel, caddy, postgresql, valkey, garage, loki, tempo, grafana, prometheus, opentelemetry-collector, promtail.
 
-### Platform services (infra-01 unless noted)
+### Service metrics (infra-01 unless noted)
 
 | Scrape job | Service | Metrics source | Grafana dashboard |
 | ---------- | ------- | -------------- | ----------------- |
-| `prometheus` | Prometheus | self-scrape `:9090` | — |
+| `prometheus` | Prometheus scraper | self-scrape `:9090` | — |
 | `grafana` | Grafana | native `:3000` | — |
 | `loki` | Loki | native `:3101/metrics` | — |
 | `tempo` | Tempo | native `:3200` | — |
@@ -222,30 +247,16 @@ Grafana queries **Prometheus** on infra-01. Every service with a Grafana dashboa
 | `keycloak-events` | Keycloak | realm metrics `:8080/realms/master/metrics` | infra/keycloak |
 | `openbao` | OpenBao | `:8200/v1/sys/metrics` | infra/openbao |
 | `garage` | Garage | native `:3903` | infra/garage |
-| `headscale` | Headscale | native `:9091` | infra/headscale |
+| `headscale` | Headscale server | native `:9091` | infra/headscale |
 | `postgres` | PostgreSQL | [postgres_exporter](https://github.com/prometheus-community/postgres_exporter) `:9187` | infra/postgres |
 | `caddy` | Caddy | admin API `:2019` | infra/caddy |
 | `synapse` | Synapse (Matrix) | `/_synapse/metrics` `:9008` | infra/synapse |
 | `litellm` | LiteLLM | prometheus-client `/metrics` `:4000` | infra/litellm |
 | `atlantis` | Atlantis | `/metrics` `:4141` | infra/atlantis |
 | `uptime-kuma` | Uptime Kuma | `/metrics` `:3001` (API key auth) | — |
+| `kennel` | Kennel | native `:3001` | kennel/overview (deploy-01) |
 
-Garage WebAdmin (`garage.scottylabs.org`) uses the **Caddy OIDC proxy** pattern. Garage S3 API is `s3.scottylabs.org` with no OIDC gate (bucket auth via access keys).
-
-Caddy on **infra-01** terminates TLS and reverse-proxies platform services. On **deploy-01**, traffic flows **Caddy → kennel** for the platform itself; Kennel then deploys apps (including its own docs) and registers their routes on Caddy via the admin API.
-
-LiteLLM (`litellm.scottylabs.org`) is the public proxy; model requests go to **cli-proxy-api** on localhost (no Prometheus scrape job yet).
-
-### Deploy and CI
-
-| Scrape job | Service | Metrics source | Host | Grafana dashboard |
-| ---------- | ------- | -------------- | ---- | ----------------- |
-| `kennel` | Kennel | native `:3001` | deploy-01 | kennel/overview |
-| `postgres` | PostgreSQL | postgres_exporter `:9187` | deploy-01 | infra/postgres |
-| `cadvisor` | cAdvisor | `:4194` | deploy-01 | infra/hosts |
-| `comin` | comin | `:4243` | deploy-01 | infra/comin |
-
-`infra/service-health` aggregates systemd and node metrics across hosts and services.
+Garage WebAdmin uses the **Caddy OIDC proxy** pattern; Garage S3 API (`s3.scottylabs.org`) has no OIDC gate. LiteLLM fronts **cli-proxy-api** on localhost (no scrape job yet). `infra/service-health` aggregates systemd and node metrics across hosts.
 
 ## Layers
 
@@ -261,9 +272,9 @@ LiteLLM (`litellm.scottylabs.org`) is the public proxy; model requests go to **c
 
 | Host | Purpose |
 | ---- | ------- |
-| **infra-01** | **Caddy** → Keycloak, OpenBao, Headscale, Headplane, Garage → WebAdmin, Forgejo CI webhooks, Matrix, Grafana stack, Vaultwarden, LiteLLM → cli-proxy-api, documentation site |
-| **deploy-01** | **Caddy** → kennel → Kennel deployments (e.g. kennel docs); internet-archive batch job (NixOS, not via Caddy) |
-| **snoopy** | Auxiliary campus host (monitored via observability stack) |
+| **infra-01** | Tailscale client; **Caddy** → public platform services; Headscale server + Headplane; **Headscale → Caddy → pgAdmin** (tailnet); Prometheus scraper + Grafana/Loki/Tempo |
+| **deploy-01** | Tailscale client; **Caddy → kennel** → Kennel deployments; **Headscale → Caddy → pgAdmin** (tailnet); internet-archive batch job |
+| **snoopy** | Tailscale client + host exporters (scraped by Prometheus on infra-01) |
 | **bus-sign-display** | On-prem display for the [bus-sign](https://codeberg.org/ScottyLabs/bus-sign) project |
 
 ## Teams and repos
