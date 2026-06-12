@@ -16,6 +16,8 @@ Aggregated pages under `src/content/docs/<project>/` are **not stored in git**. 
 
 This repository's own pages live here under **Documentation Hub**, separate from the Starlight site shell in `src/content/docs/`.
 
+See [Tech Stack](/documentation/tech-stack/) for a clickable overview of repos, hosts, and platform services.
+
 ## Adding your project
 
 Add your repository in governance (no flag needed). To exclude a repo:

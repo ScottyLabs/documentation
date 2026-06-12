@@ -105,4 +105,4 @@ If either command returns **permission denied**, ask a tech lead or someone in D
 
 ## Next steps
 
-After SSH is working, follow [Contributing](/scottylabs/contributing/) to request access through [Governance](https://codeberg.org/scottylabs/governance). See [GitHub Organizations](/scottylabs/github-orgs/) for how ScottyLabs uses GitHub and Codeberg together.
+After SSH is working, follow [Contributing](/scottylabs/onboarding/contributing/) to request access through [Governance](https://codeberg.org/scottylabs/governance). See [GitHub Organizations](/scottylabs/platform/github-orgs/) for how ScottyLabs uses GitHub and Codeberg together.

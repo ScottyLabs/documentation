@@ -53,15 +53,15 @@ that you will be working on.
 
 ### Setup and Develop
 
-Set up SSH for Codeberg (and optionally GitHub) using the [CodeBerg Setup](/scottylabs/codeberg-setup/) guide. Repository-specific setup steps are in each project's docs.
+Set up SSH for Codeberg (and optionally GitHub) using the [Codeberg Setup](/scottylabs/onboarding/codeberg-setup/) guide. Repository-specific setup steps are in each project's docs.
 
 ### Submit a Pull Request and Get Credited as a Contributor
 
-See [PR Process](/scottylabs/pr-process/).
+See [PR Process](/scottylabs/development/pr-process/).
 
 ## Do you have questions?
 
-Ask any question in the [ScottyLabs Slack](/scottylabs/communication/)
+Ask any question in the [ScottyLabs Slack](/scottylabs/community/communication/)
 by messaging in the corresponding channel or DMing any maintainer of the project.
 You can find information about the Slack channels and maintainers of a project
 in [Governance](https://codeberg.org/scottylabs/governance/src/branch/main/data/teams).

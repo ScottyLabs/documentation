@@ -18,6 +18,7 @@ import {
   rewriteMarkdownLinks,
   saveRedirects,
 } from './redirects.ts';
+import { applyScottyLabsRedirects } from './scottylabs-redirects.ts';
 
 const CONTENT_DIR = 'src/content/docs';
 
@@ -46,6 +47,7 @@ export async function aggregateStarlightDocs(projects: Project[]): Promise<void>
     await aggregateProjectDocs(project);
   }
 
+  applyScottyLabsRedirects(aggregationRedirects);
   await saveRedirects(aggregationRedirects);
   
   console.log('✅ Documentation aggregated\n');

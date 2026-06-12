@@ -180,7 +180,7 @@ import mermaid from 'astro-mermaid';
 export default defineConfig({
   trailingSlash: 'always',
   integrations: [
-    mermaid({ autoTheme: true }),
+    mermaid({ autoTheme: true, mermaidConfig: { securityLevel: 'loose' } }),
     starlight({
       title: 'ScottyLabs Docs',
       description: 'Unified documentation for ScottyLabs projects',

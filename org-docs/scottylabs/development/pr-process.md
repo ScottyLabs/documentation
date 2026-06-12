@@ -40,7 +40,7 @@ own code from the "Files changed" tab after opening the PR.
 
 It is your responsibility to run the project locally, thoroughly test your work, and employ common sense to avoid wasting a reviewer's time in needing to point out obvious flaws. It is not uncommon for inexperienced contributors to request review when their code entirely fails to implement the task at hand, or breaks surrounding functionality in a way that should have been immediately apparent. This doesn't leave a good impression and can frustrate reviewers.
 
-If you don't actually understand what is intended with your feature/fix and why this is meaningful to a user of the project, spend time becoming that user and understanding the context. Learning at least the basics of using the project is important. Then ask questions in [Slack](/scottylabs/communication/) if you're still confused about specific edge cases or the wording of the task.
+If you don't actually understand what is intended with your feature/fix and why this is meaningful to a user of the project, spend time becoming that user and understanding the context. Learning at least the basics of using the project is important. Then ask questions in [Slack](/scottylabs/community/communication/) if you're still confused about specific edge cases or the wording of the task.
 
 It is also common for larger tasks to enter a round of review to confirm the direction is correct before you go back and polish the remaining details of the implementation. It's good to be in touch with the team to decide on when is the right time for this kind of preliminary review. It can save you effort reworking problems if you misunderstand the goals, or if the exact details of the requirements were never well-defined and you'll need to iterate on the design together with the team. Don't feel that every part of your PR needs to be 100% finished before requesting feedback, but also be clear so you aren't taking a reviewer away from other work to point out that you are obviously nowhere near done.
 
@@ -76,7 +76,7 @@ Be sure to pull the rebased, or updated-with-a-merge-commit, branch after you or
 
 ScottyLabs uses [CodeRabbit](https://www.coderabbit.ai/) for AI code reviews.
 It will automatically review your PR. Please respond to its comments and update
-your PR as needed. See [AI Code Reviewers](/scottylabs/ai-code-reviewers/) for configuration details.
+your PR as needed. See [AI Code Reviewers](/scottylabs/development/ai-code-reviewers/) for configuration details.
 
 ### Human Code Review
 
@@ -98,13 +98,13 @@ When changes are requested, the reviewer will usually mark the PR as a draft aga
 - If it's marked as ready for review, it means there is nothing more for you to do until the reviewer has time to review it.
 
 After any number of back-and-forth cycles, a reviewer (usually Yuxiang who often gives the final say) will merge your PR. All your commits will be rebased on the `staging` branch. This keeps the Git history linear and easy to follow.
-During each [ScottyLabs work session](/scottylabs/communication/),
+During each [ScottyLabs work session](/scottylabs/community/communication/),
 the `staging` branch will be merged into the `main` branch, updating the live website.
 
 ## Credited as a Contributor
 
 Once your PR is merged and that you have also come to one
-[ScottyLabs work session](/scottylabs/communication/),
+[ScottyLabs work session](/scottylabs/community/communication/),
 you will be credited as a contributor in the corresponding team in
 [Governance](https://codeberg.org/scottylabs/governance/src/branch/main/data/teams), **forever**!
 
