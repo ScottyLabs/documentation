@@ -1,0 +1,19 @@
+---
+type Props = {
+  scenePath?: string;
+  caption?: string;
+};
+
+const { scenePath = '/diagrams/tech-stack.excalidraw.json', caption } = Astro.props;
+const viewerSrc = `/excalidraw-viewer.html?scene=${encodeURIComponent(scenePath)}`;
+---
+
+<figure class="excalidraw-figure">
+  <iframe
+    class="excalidraw-frame"
+    src={viewerSrc}
+    title="ScottyLabs tech stack diagram"
+    loading="lazy"
+    referrerpolicy="same-origin"></iframe>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>

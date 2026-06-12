@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Excalidraw viewer</title>
+    <style>
+      html,
+      body,
+      #root {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@excalidraw/excalidraw@0.18.1/dist/excalidraw.production.min.css"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module">
+      import React from 'https://esm.sh/react@18.3.1';
+      import { createRoot } from 'https://esm.sh/react-dom@18.3.1/client';
+      import { Excalidraw } from 'https://esm.sh/@excalidraw/excalidraw@0.18.1?deps=react@18.3.1,react-dom@18.3.1';
+
+      const params = new URLSearchParams(window.location.search);
+      const scenePath = params.get('scene') ?? '/diagrams/tech-stack.excalidraw.json';
+      const response = await fetch(scenePath);
+
+      if (!response.ok) {
+        document.body.innerHTML = `<p style="padding:1rem;font-family:sans-serif">Failed to load diagram: ${scenePath}</p>`;
+        throw new Error(`Failed to load ${scenePath}`);
+      }
+
+      const scene = await response.json();
+
+      createRoot(document.getElementById('root')).render(
+        React.createElement(Excalidraw, {
+          initialData: scene,
+          viewModeEnabled: true,
+          zenModeEnabled: true,
+          gridModeEnabled: false,
+          UIOptions: {
+            canvasActions: {
+              changeViewBackgroundColor: false,
+              clearCanvas: false,
+              export: false,
+              loadScene: false,
+              saveToActiveFile: false,
+              toggleTheme: true,
+              saveAsImage: true,
+            },
+          },
+        }),
+      );
+    </script>
+  </body>
+</html>

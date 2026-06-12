@@ -16,7 +16,7 @@ Examples:
 
 ## Excalidraw
 
-https://excalidraw.com. Useful when collaborating and when you need more flexibility.
+https://excalidraw.com. Useful when collaborating and when you need more flexibility. The [tech stack](/documentation/tech-stack/) page embeds an Excalidraw diagram (source: `documentation/scripts/generate-tech-stack-excalidraw.ts`, output: `public/diagrams/tech-stack.excalidraw.json`).
 
 Examples:
 

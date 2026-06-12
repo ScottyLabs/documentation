@@ -4,6 +4,13 @@ import mermaid from 'astro-mermaid';
 
 export default defineConfig({
   trailingSlash: 'always',
+  vite: {
+    resolve: {
+      alias: {
+        '@': new URL('./src', import.meta.url).pathname,
+      },
+    },
+  },
   integrations: [
     mermaid({
       autoTheme: true,
@@ -109,6 +116,7 @@ export default defineConfig({
         './src/styles/scalar-theme.css',
         './src/styles/heading-links.css',
         './src/styles/mermaid.css',
+        './src/styles/excalidraw.css',
       ],
     }),
   ],

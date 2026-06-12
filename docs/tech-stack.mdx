@@ -2,167 +2,19 @@
 title: Tech Stack
 ---
 
-ScottyLabs platform overview. **Click any repo node** to open it on Codeberg. Scroll horizontally if needed, or use the diagram fullscreen button to zoom.
+import ExcalidrawDiagram from '@/components/ExcalidrawDiagram.astro';
 
-The platform diagram reads left to right: **governance**, then each **NixOS host**. On every host, **Tailscale** (Headscale client) and **host exporters** run alongside **Caddy**. Public web traffic hits **Caddy first**; tailnet-only services like pgAdmin use **Headscale → Caddy → app** (the reverse order from the [Caddy OIDC proxy](#caddy-oidc-proxy) pattern). Services marked **\*** export Prometheus metrics scraped by the Prometheus server on infra-01. Cross-host links are described in prose below the diagram.
+ScottyLabs platform overview. **Pan and zoom** the diagram below; repo boxes link to Codeberg when clicked. Orange borders or **\*** mark services that export Prometheus metrics.
+
+The diagram reads left to right: **governance**, then **infra-01** and **deploy-01**. On every host, **Tailscale** (Headscale client) and **host exporters** run alongside **Caddy**. Public web traffic hits **Caddy first**; tailnet-only services like pgAdmin use **Headscale → Caddy → app** (the reverse order from the [Caddy OIDC proxy](#caddy-oidc-proxy) pattern). Cross-host links are described in prose below the diagram.
 
 Sources: [governance](https://codeberg.org/ScottyLabs/governance) team data, [infrastructure](https://codeberg.org/ScottyLabs/infrastructure) NixOS hosts, and this monorepo checkout.
 
 ## Platform
 
-```mermaid
-%%{init: {"flowchart": {"useMaxWidth": false, "curve": "linear", "nodeSpacing": 36, "rankSpacing": 48, "padding": 16}, "themeVariables": {"fontSize": "16px"}}}%%
-flowchart LR
-  subgraph col_repos ["Governance"]
-    direction TB
-    gov_repo["governance"]
-    gov_repo --> tofu["OpenTofu · Atlantis"]
-    tofu --> provisioned["Keycloak · Forgejo · GitHub · Vaultwarden · Discord · Slack · Sentry · Synapse"]
-    observability_repo["observability"]
-    documentation_repo["documentation"]
-    gov_repo --> observability_repo
-    gov_repo --> documentation_repo
-    infra_repo["infrastructure"]
-    gov_repo --> infra_repo
-    kennel_repo["kennel"]
-    devenv_repo["devenv"]
-    keycloak_theme["keycloak-theme"]
-    internet_archive["internet-archive"]
-  end
-
-  subgraph col_infra01 ["infra-01"]
-    direction TB
-    tailscale_infra["Tailscale client"]
-    host_exp_infra["Host exporters · node · systemd · cAdvisor · comin"]
-    caddy_infra["Caddy · public"]
-    subgraph chain_id ["Identity & access"]
-      direction TB
-      keycloak["Keycloak · IdP*"]
-      openbao["OpenBao · native OIDC*"]
-      vaultwarden["Vaultwarden"]
-    end
-    subgraph chain_tailnet ["Tailnet control · infra-01 only"]
-      direction TB
-      headplane["Headplane · native OIDC"]
-      headscale_srv["Headscale server*"]
-      headplane --> headscale_srv
-    end
-    subgraph chain_plat ["Storage & CI"]
-      direction TB
-      forgejo_ci["Forgejo CI"]
-      docs_host["docs site"]
-      matrix["Matrix · Synapse*"]
-    end
-    subgraph chain_garage ["Garage S3"]
-      direction TB
-      garage_s3["Garage*"]
-      garage_webadmin["Garage WebAdmin · Caddy OIDC proxy"]
-      garage_s3 --> garage_webadmin
-    end
-    subgraph chain_obs ["Observability · infra-01"]
-      direction TB
-      grafana["Grafana · native OIDC*"]
-      prom_scraper["Prometheus scraper*"]
-      loki["Loki*"]
-      tempo["Tempo*"]
-      uptime["Uptime Kuma*"]
-      grafana --> prom_scraper
-    end
-    subgraph chain_ai ["AI gateway"]
-      direction TB
-      litellm["LiteLLM · native OIDC*"]
-      cli_proxy["cli-proxy-api"]
-      litellm --> cli_proxy
-    end
-    caddy_tail_infra["Caddy · tailnet"]
-    pgadmin_infra["pgAdmin"]
-    caddy_tail_infra --> pgadmin_infra
-    tailscale_infra --> caddy_tail_infra
-    caddy_infra --> chain_id
-    caddy_infra --> chain_tailnet
-    caddy_infra --> chain_plat
-    caddy_infra --> chain_garage
-    caddy_infra --> chain_obs
-    caddy_infra --> chain_ai
-  end
-
-  subgraph col_deploy01 ["deploy-01"]
-    direction TB
-    tailscale_deploy["Tailscale client"]
-    host_exp_deploy["Host exporters · node · systemd · cAdvisor · comin"]
-    caddy_deploy["Caddy · public"]
-    caddy_tail_deploy["Caddy · tailnet"]
-    pgadmin_deploy["pgAdmin"]
-    caddy_tail_deploy --> pgadmin_deploy
-    tailscale_deploy --> caddy_tail_deploy
-    subgraph kennel ["kennel"]
-      direction LR
-      kennel_svc["kennel · platform*"]
-      subgraph team_courses ["CMU Courses · Quest"]
-        direction TB
-        kennel_docs["kennel docs"]
-        courses["courses"]
-        quest["quest"]
-      end
-      housing["housing"]
-      tartan_vote["tartan-vote"]
-      subgraph team_cbp ["CBP"]
-        direction TB
-        bus_sign["bus-sign"]
-        dalmatian["dalmatian"]
-        discord_verify["discord-verify"]
-      end
-      subgraph team_slai ["SLAI"]
-        direction TB
-        cmugpt_surface["cmugpt-surface"]
-        cmugpt_agent["cmugpt-agent"]
-        mcp_server["mcp-server"]
-        sms_surface["sms-surface"]
-      end
-      components["components"]
-      kennel_svc --> kennel_docs
-    end
-    ia_batch["internet-archive · batch job"]
-    caddy_deploy --> kennel_svc
-  end
-
-  infra_repo --> col_infra01
-  infra_repo --> col_deploy01
-
-  prom_scraper -.-> host_exp_infra
-  prom_scraper -.-> host_exp_deploy
-
-  observability_repo -.-> prom_scraper
-  documentation_repo -.-> docs_host
-  keycloak_theme -.-> keycloak
-  kennel_repo -.-> kennel_svc
-  devenv_repo -.-> kennel_svc
-  internet_archive -.-> ia_batch
-
-  classDef metrics stroke:#c2410c,stroke-width:3px
-  class keycloak,openbao,matrix,garage_s3,grafana,prom_scraper,loki,tempo,uptime,litellm,headscale_srv,kennel_svc metrics
-
-  click gov_repo "https://codeberg.org/ScottyLabs/governance" "governance"
-  click infra_repo "https://codeberg.org/ScottyLabs/infrastructure" "infrastructure"
-  click kennel_repo "https://codeberg.org/ScottyLabs/kennel" "kennel"
-  click devenv_repo "https://codeberg.org/ScottyLabs/devenv" "devenv"
-  click observability_repo "https://codeberg.org/ScottyLabs/observability" "observability"
-  click documentation_repo "https://codeberg.org/ScottyLabs/documentation" "documentation"
-  click keycloak_theme "https://codeberg.org/ScottyLabs/keycloak-theme" "keycloak-theme"
-  click internet_archive "https://codeberg.org/ScottyLabs/internet-archive" "internet-archive"
-  click courses "https://codeberg.org/ScottyLabs/courses" "courses"
-  click housing "https://codeberg.org/ScottyLabs/housing" "housing"
-  click tartan_vote "https://codeberg.org/ScottyLabs/tartan-vote" "tartan-vote"
-  click quest "https://codeberg.org/ScottyLabs/quest" "quest"
-  click dalmatian "https://codeberg.org/ScottyLabs/dalmatian" "dalmatian"
-  click bus_sign "https://codeberg.org/ScottyLabs/bus-sign" "bus-sign"
-  click discord_verify "https://codeberg.org/ScottyLabs/discord-verify" "discord-verify"
-  click cmugpt_surface "https://codeberg.org/ScottyLabs/cmugpt-surface" "cmugpt-surface"
-  click cmugpt_agent "https://codeberg.org/ScottyLabs/cmugpt-agent" "cmugpt-agent"
-  click mcp_server "https://codeberg.org/ScottyLabs/mcp-server" "mcp-server"
-  click sms_surface "https://codeberg.org/ScottyLabs/sms-surface" "sms-surface"
-  click components "https://codeberg.org/ScottyLabs/components" "components"
-```
+<ExcalidrawDiagram
+  caption="Hand-laid-out in Excalidraw. Edit documentation/scripts/generate-tech-stack-excalidraw.ts and run bun run generate:tech-stack-diagram, or export from excalidraw.com and replace public/diagrams/tech-stack.excalidraw.json."
+/>
 
 **Diagram key:** orange border or `*` = Prometheus service metrics. **Host exporters** (node, systemd, cAdvisor, comin) run on every NixOS host; the **Prometheus scraper** on infra-01 collects them along with service metrics.
 
@@ -214,7 +66,7 @@ Admin → Headscale (Tailscale) → Caddy → pgAdmin
 
 ## Application repos
 
-Kennel builds and deploys repos marked `kennel = true` in governance. Those deployments live inside the **kennel** node on deploy-01 in the platform diagram above.
+Kennel builds and deploys repos marked `kennel = true` in governance. Those deployments live inside the **kennel** area on deploy-01 in the platform diagram above.
 
 ## Prometheus exporters
 
