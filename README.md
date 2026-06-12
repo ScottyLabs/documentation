@@ -30,14 +30,31 @@ Every ScottyLabs project, guide, process, and resource in one place:
 The docs site supports [Accept Markdown](https://acceptmarkdown.com/) content negotiation. AI agents can read any page as clean Markdown from the same URL browsers use for HTML:
 
 ```bash
-curl -sI -H "Accept: text/markdown" https://docs.scottylabs.org/scottylabs/contributing/
+# Canonical page (preferred)
+curl -sI -H "Accept: text/markdown" https://docs.scottylabs.org/scottylabs/onboarding/contributing/
 # Content-Type: text/markdown; charset=utf-8
 # Vary: Accept
 
-curl -s -H "Accept: text/markdown" https://docs.scottylabs.org/scottylabs/contributing/
+curl -s -H "Accept: text/markdown" https://docs.scottylabs.org/scottylabs/onboarding/contributing/
 ```
 
-At build time, the site exports a Markdown counterpart for every HTML page. Caddy on infra-01 negotiates `Accept: text/markdown` at the edge and serves the matching `.md` file from Garage.
+Legacy URLs (e.g. `/scottylabs/contributing/`) return Markdown redirect stubs pointing to the canonical path.
+
+At build time, the site exports a Markdown counterpart for every HTML page. **Caddy on infra-01** must negotiate `Accept: text/markdown` at the edge and rewrite requests to the matching `.md` file in Garage. The docs CI upload alone is not enough.
+
+**Verify negotiation is live** (both checks should pass after infra deploy):
+
+```bash
+# Should include: Vary: Accept
+curl -sI -H "Accept: text/html" https://docs.scottylabs.org/scottylabs/onboarding/contributing/
+
+# Should include: Content-Type: text/markdown and Vary: Accept (not text/html)
+curl -sI -H "Accept: text/markdown" https://docs.scottylabs.org/scottylabs/onboarding/contributing/
+```
+
+If the second request still returns `content-type: text/html` with no `Vary: Accept`, apply the `docs.scottylabs.org` Caddy config in [`infrastructure/hosts/infra-01/garage.nix`](https://codeberg.org/ScottyLabs/infrastructure/src/branch/main/hosts/infra-01/garage.nix) on infra-01 (`nixos-rebuild switch`).
+
+Markdown files are always available at the sibling `index.md` path as a fallback, e.g. `https://docs.scottylabs.org/scottylabs/onboarding/contributing/index.md`.
 
 ## Architecture
 
