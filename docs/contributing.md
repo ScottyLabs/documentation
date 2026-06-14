@@ -26,7 +26,7 @@ Published pages are readable by AI agents via [Accept Markdown](https://acceptma
 
 Place `.excalidraw.json` files in `docs/diagrams/` in your repo. They are published at `/diagrams/{your-project-slug}/` and can be embedded with the hub’s `ExcalidrawDiagram` component (see [Diagramming](/scottylabs/design/diagramming/)).
 
-Pushes that change `docs/`, `diagrams/`, or `scripts/generate-*-excalidraw.ts` trigger a docs rebuild automatically via the org webhook on infra-01 (repos with `docs = true` in governance). Per-repo fallback: copy [`.forgejo/examples/trigger-docs-diagrams.yml`](https://codeberg.org/ScottyLabs/documentation/src/branch/main/.forgejo/examples/trigger-docs-diagrams.yml) with the `DOCS_TRIGGER_TOKEN` secret.
+Pushes that change `docs/` trigger a docs rebuild via `docs-updated`; changes to `diagrams/` or `scripts/generate-*-excalidraw.ts` use `diagrams-updated`. Both are handled automatically by the org webhook on infra-01 (repos with `docs = true` in governance). Per-repo fallback: copy [`.forgejo/examples/trigger-docs-update.yml`](https://codeberg.org/ScottyLabs/documentation/src/branch/main/.forgejo/examples/trigger-docs-update.yml) or [`.forgejo/examples/trigger-docs-diagrams.yml`](https://codeberg.org/ScottyLabs/documentation/src/branch/main/.forgejo/examples/trigger-docs-diagrams.yml) with the `DOCS_TRIGGER_TOKEN` secret.
 
 ## Local development
 

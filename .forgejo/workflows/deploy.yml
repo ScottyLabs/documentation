@@ -9,7 +9,7 @@ on:
       - main
   workflow_dispatch:
   repository_dispatch:
-    types: [governance-updated, diagrams-updated]
+    types: [governance-updated, docs-updated, diagrams-updated]
 
 jobs:
   build-and-deploy:

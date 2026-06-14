@@ -8,7 +8,8 @@ Workflows, example triggers for other repositories, and scripts for the document
 | ---- | ------- |
 | `workflows/deploy.yml` | Build and deploy this repository (runs on push / dispatch) |
 | `examples/trigger-docs-rebuild.yml` | Copy to **governance** repo when `data/` changes |
-| `examples/trigger-docs-diagrams.yml` | Copy to **project** repos when `docs/` or Excalidraw scenes change |
+| `examples/trigger-docs-update.yml` | Copy to **project** repos when `docs/` changes |
+| `examples/trigger-docs-diagrams.yml` | Copy to **project** repos when Excalidraw scenes change |
 | `scripts/dispatch-rebuild.sh` | Shell helper for `repository_dispatch` (local or custom workflows) |
 
 Files under `examples/` are **not** executed by Forgejo Actions in this repo.
@@ -20,7 +21,7 @@ Files under `examples/` are **not** executed by Forgejo Actions in this repo.
 - Push to `main`
 - Pull requests to `main`
 - `workflow_dispatch`
-- `repository_dispatch` types `governance-updated` and `diagrams-updated`
+- `repository_dispatch` types `governance-updated`, `docs-updated`, and `diagrams-updated`
 
 ## Trigger a rebuild from another repository
 
@@ -40,6 +41,14 @@ cp documentation/.forgejo/examples/trigger-docs-rebuild.yml \
   .forgejo/workflows/trigger-docs-rebuild.yml
 ```
 
+**Project repos** (`docs/` changes):
+
+```bash
+mkdir -p .forgejo/workflows
+cp documentation/.forgejo/examples/trigger-docs-update.yml \
+  .forgejo/workflows/trigger-docs-update.yml
+```
+
 **Project repos** (Excalidraw diagrams):
 
 ```bash
@@ -50,13 +59,14 @@ cp documentation/.forgejo/examples/trigger-docs-diagrams.yml \
 
 ### 3. Org push webhook (optional)
 
-infra-01 dispatches `diagrams-updated` when any Codeberg push to a docs-enabled repo includes changes under `docs/`, `**/diagrams/*.excalidraw.json`, or `scripts/generate-*-excalidraw.ts` (see `infrastructure/services/forgejo-ci/` and governance `forgejo_docs_webhooks.tf.json`). Per-repo workflows are still useful when the org webhook is unavailable.
+infra-01 dispatches `docs-updated` when a push to a docs-enabled repo changes `docs/`, and `diagrams-updated` for root-level diagram files or Excalidraw generator scripts (see `infrastructure/services/forgejo-ci/` and governance `forgejo_docs_webhooks.tf.json`). Per-repo workflows are still useful when the org webhook is unavailable.
 
 ## Shell helper
 
 ```bash
 export DOCS_TRIGGER_TOKEN=...
 .forgejo/scripts/dispatch-rebuild.sh governance-updated
+.forgejo/scripts/dispatch-rebuild.sh docs-updated
 .forgejo/scripts/dispatch-rebuild.sh diagrams-updated
 ```
 

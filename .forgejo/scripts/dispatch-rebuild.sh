@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Dispatch a repository_dispatch event to the documentation hub.
 # Usage: DOCS_TRIGGER_TOKEN=... dispatch-rebuild.sh <event_type>
-# Example event types: governance-updated, diagrams-updated
+# Example event types: governance-updated, docs-updated, diagrams-updated
 
 set -euo pipefail
 
