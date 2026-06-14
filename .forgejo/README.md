@@ -8,7 +8,7 @@ Workflows, example triggers for other repositories, and scripts for the document
 | ---- | ------- |
 | `workflows/deploy.yml` | Build and deploy this repository (runs on push / dispatch) |
 | `examples/trigger-docs-rebuild.yml` | Copy to **governance** repo when `data/` changes |
-| `examples/trigger-docs-diagrams.yml` | Copy to **project** repos when Excalidraw scenes change |
+| `examples/trigger-docs-diagrams.yml` | Copy to **project** repos when `docs/` or Excalidraw scenes change |
 | `scripts/dispatch-rebuild.sh` | Shell helper for `repository_dispatch` (local or custom workflows) |
 
 Files under `examples/` are **not** executed by Forgejo Actions in this repo.
@@ -50,7 +50,7 @@ cp documentation/.forgejo/examples/trigger-docs-diagrams.yml \
 
 ### 3. Org push webhook (optional)
 
-infra-01 also dispatches `diagrams-updated` when any Codeberg push includes `**/diagrams/*.excalidraw.json` or `scripts/generate-*-excalidraw.ts` (see `infrastructure/services/forgejo-ci/`). Per-repo workflows are still useful when the org webhook is unavailable.
+infra-01 dispatches `diagrams-updated` when any Codeberg push to a docs-enabled repo includes changes under `docs/`, `**/diagrams/*.excalidraw.json`, or `scripts/generate-*-excalidraw.ts` (see `infrastructure/services/forgejo-ci/` and governance `forgejo_docs_webhooks.tf.json`). Per-repo workflows are still useful when the org webhook is unavailable.
 
 ## Shell helper
 
