@@ -1,6 +1,22 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import mermaid from 'astro-mermaid';
+import { remarkQuote } from './src/plugins/remark-quote.js';
+
+function quoteBoxIntegration() {
+  return {
+    name: 'quote-box',
+    hooks: {
+      'astro:config:setup': ({ config, updateConfig }) => {
+        updateConfig({
+          markdown: {
+            remarkPlugins: [...(config.markdown?.remarkPlugins || []), remarkQuote],
+          },
+        });
+      },
+    },
+  };
+}
 
 export default defineConfig({
   trailingSlash: 'always',
@@ -117,7 +133,9 @@ export default defineConfig({
         './src/styles/heading-links.css',
         './src/styles/mermaid.css',
         './src/styles/excalidraw.css',
+        './src/styles/quote.css',
       ],
     }),
+    quoteBoxIntegration(),
   ],
 });
