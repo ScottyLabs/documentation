@@ -2,7 +2,9 @@
 title: Git Best Practices
 ---
 
+```
 "Good commit habits reflect on the developer. Being able to clearly reflect upon your changes and describe the impact of them means you are able to reason about your code and about why you are making the changes you are." - Yiyoung Liu
+```
 
 Generally to preserve good git history for readability and revertability, it is best to have some standard practices. Not only would it make it easier for new contributors, it would create a positive look on scottylabs if we have good git history.
 
