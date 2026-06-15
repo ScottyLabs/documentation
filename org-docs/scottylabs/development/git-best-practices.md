@@ -51,11 +51,9 @@ Beyond just commit messages, there are several things that can be done to help w
 
 ### Pulling to a Branch
 
-When you re-pull changes from main, use `rebase` instead of `merge`. This produces cleaner commit history and retains the commit owner.
+When you re-pull changes from main, use `rebase` instead of `merge`. This produces cleaner commit history and retains the commit owner, since rebase basically places your commits on top of current main again, meaning commit history and permissions/CODEOWNERS especially are computed correctly.
 
-In contrast, merge commits are owned by the person who merges the pr. For example, this breaks governance's file owner checks by making governance think someone who updated their branch to main via a merge commit was actually touching all of those files that were modified on main which is wrong.
-
-Rebase basically places your commits on top of current main again, meaning commit history and permissions/CODEOWNERS especially fits correctly.
+In contrast, merge commits are owned by the person who merges the PR. For example, this breaks governance's file owner checks by making governance think someone who updated their branch to main via a merge commit was actually touching all of those files that were modified on main. This would cause CODEOWNERS issues, for instance, and prevent tech leads from being able to merge PRs from their own members.
 
 ### Merging a PR
 
