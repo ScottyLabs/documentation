@@ -1,0 +1,40 @@
+---
+title: Git Best Practices
+---
+
+Generally to preserve good git history for readability and revertability, it is best to have some standard practices. Not only would it make it easier for new contributors, it would create a positive look on scottylabs if we have good git history.
+
+## Conventional Commits
+
+Generally we want to use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) so that we can automatically get a CHANGELOG in git history and communicate the changes to other members and sponsors.
+
+This means that usually the commit is in a format like `<nature>(<scope>): <changes>`. Here nature is the nature of the commit, i.e. if it was a fix, feature, chore, etc. Scope is what the commit deals with, for instance the frontend, docs, or backend. Lastly the changes is what the commits actually changed.
+
+Some of the most common natures are:
+
+- `feat` for new features
+- `fix` for bugfixes
+- `docs` for changes to documentation
+- `chore` for maintenance and routine tasks
+- `refactor` for refactors if it does not change behavior (e.g. a library version update)
+- `revert` if a previous change was reverted
+
+[This blog](https://www.bavaga.com/blog/2025/01/27/my-ultimate-conventional-commit-types-cheatsheet/) is a pretty good resource.
+
+On many kennel repositories (the ones using devenv and governance PRs) Conventional Commits are enforced by DevOps.
+
+## Git Policy
+
+Beyond just commit messages, there are several things that can be done to help with git commit history.
+
+### Pulling to a Branch
+
+When you re-pull changes from main, use `rebase` instead of `merge`. This produces cleaner commit history and retains the commit owner.
+
+In contrast, merge commits are owned by the person who merges the pr. For example, this breaks governance's file owner checks by making governance think someone who updated their branch to main via a merge commit was actually touching all of those files that were modified on main which is wrong.
+
+Rebase basically places your commits on top of current main again, meaning commit history and permissions/CODEOWNERS especially fits correctly.
+
+### Merging a PR
+
+Similarly to the above, choose `rebase and fast forward` instead of creating merge commits in any way. This makes it so that commit history is preserved.
