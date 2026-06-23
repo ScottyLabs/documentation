@@ -2,7 +2,7 @@
 title: Contributing
 ---
 
-To contribute to a ScottyLabs project, follow the instructions in [Governance](https://codeberg.org/scottylabs/governance) to add yourself as a [contributor](/governance/adding-yourself-to-a-team/) and join the corresponding team as an applicant to obtain the necessary permissions.
+To contribute to a ScottyLabs project, follow the README instructions in [Governance](https://codeberg.org/scottylabs/governance) to join a team and obtain the necessary permissions.
 
 You can join **anytime** of the year!
 
@@ -43,9 +43,8 @@ period of time.*
 
 ### Request Permission
 
-Follow the instructions in [Governance](https://codeberg.org/scottylabs/governance)
-to add yourself as a [contributor](/governance/adding-yourself-to-a-team/)
-and join the corresponding team as an applicant to obtain the necessary permissions.
+Follow the README instructions in [Governance](https://codeberg.org/scottylabs/governance)
+to join a team and obtain the necessary permissions.
 
 When opening your Governance PR, make sure to
 [link the corresponding issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/)
