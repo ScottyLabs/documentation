@@ -27,6 +27,9 @@ let aggregationRedirects: Redirect[] = [];
 /** mdBook and similar tools use these as navigation metadata, not pages. */
 const SKIPPED_MARKDOWN_FILES = new Set(['SUMMARY.md', 'SUMMARY.mdx']);
 
+/** Homepage files that should be skipped from docs/ since README.md is used as the homepage. */
+const SKIPPED_INDEX_FILES = new Set(['index.md', 'index.mdx', 'README.md', 'readme.md']);
+
 /** AI agent context ([agents.md](https://agents.md/)); repo-local only, not published pages. */
 const SKIPPED_AGENT_FILES = new Set(['AGENTS.md']);
 
@@ -80,7 +83,18 @@ async function aggregateProjectDocs(project: Project): Promise<void> {
   await rm(targetDocs, { recursive: true, force: true });
   await mkdir(targetDocs, { recursive: true });
   
-  // Copy all markdown files
+  // First, copy README.md from repo root as the homepage (index.md)
+  const readmePath = join(repoPath, 'README.md');
+  try {
+    await stat(readmePath);
+    const indexPath = join(targetDocs, 'index.md');
+    await processMarkdownFile(readmePath, indexPath, project, 'README.md');
+    console.log(`  ✓ Using README.md as homepage for ${project.name}`);
+  } catch {
+    console.warn(`  ⚠️  No README.md found at ${readmePath}, skipping homepage`);
+  }
+  
+  // Then copy all markdown files from docs directory
   await copyMarkdownFiles(sourceDocs, targetDocs, project);
   
   console.log(`  ✓ ${project.name} docs copied to ${targetDocs}`);
@@ -123,7 +137,7 @@ function isAggregateableMarkdown(name: string, project: Project): boolean {
   if (!name.endsWith('.md') && !name.endsWith('.mdx')) {
     return false;
   }
-  if (SKIPPED_MARKDOWN_FILES.has(name) || SKIPPED_AGENT_FILES.has(name)) {
+  if (SKIPPED_MARKDOWN_FILES.has(name) || SKIPPED_AGENT_FILES.has(name) || SKIPPED_INDEX_FILES.has(name)) {
     return false;
   }
   if (isDocumentationHubProject(project) && SKIPPED_SHELL_FILES.has(name)) {
