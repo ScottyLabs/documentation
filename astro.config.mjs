@@ -72,8 +72,11 @@ export default defineConfig({
         },
         {
                 label: "ScottyLabs",
-                link: "/scottylabs/",
                 items: [
+                        {
+                                label: "Overview",
+                                link: "/scottylabs/"
+                        },
                         {
                                 label: "Community",
                                 items: [
@@ -164,8 +167,7 @@ export default defineConfig({
                                         }
                                 ]
                         }
-                ],
-                collapsed: true
+                ]
         },
         {
                 label: "Bus Sign",
@@ -177,8 +179,11 @@ export default defineConfig({
         },
         {
                 label: "Dalmatian",
-                link: "/dalmatian/",
                 items: [
+                        {
+                                label: "Overview",
+                                link: "/dalmatian/"
+                        },
                         {
                                 label: "Contributing",
                                 link: "/dalmatian/contributing/"
@@ -187,8 +192,7 @@ export default defineConfig({
                                 label: "Setup",
                                 link: "/dalmatian/setup/"
                         }
-                ],
-                collapsed: true
+                ]
         },
         {
                 label: "Discord Verify",
@@ -197,6 +201,10 @@ export default defineConfig({
         {
                 label: "@scottylabs/components",
                 link: "/components/"
+        },
+        {
+                label: "ScottyLabs.org!",
+                link: "/scottylabs-org/"
         },
         {
                 label: "Terrier",
@@ -220,8 +228,11 @@ export default defineConfig({
         },
         {
                 label: "CMUHousing",
-                link: "/housing/",
                 items: [
+                        {
+                                label: "Overview",
+                                link: "/housing/"
+                        },
                         {
                                 label: "Contributing",
                                 link: "/housing/contributing/"
@@ -230,13 +241,15 @@ export default defineConfig({
                                 label: "Setup",
                                 link: "/housing/setup/"
                         }
-                ],
-                collapsed: true
+                ]
         },
         {
                 label: "Tartan Vote",
-                link: "/tartan-vote/",
                 items: [
+                        {
+                                label: "Overview",
+                                link: "/tartan-vote/"
+                        },
                         {
                                 label: "Crates",
                                 items: [
@@ -306,13 +319,15 @@ export default defineConfig({
                                 label: "Setup",
                                 link: "/tartan-vote/setup/"
                         }
-                ],
-                collapsed: true
+                ]
         },
         {
                 label: "ScottyLabs Infrastructure",
-                link: "/infrastructure/",
                 items: [
+                        {
+                                label: "Overview",
+                                link: "/infrastructure/"
+                        },
                         {
                                 label: "Secrets",
                                 items: [
@@ -359,8 +374,7 @@ export default defineConfig({
                                 label: "Troubleshooting",
                                 link: "/infrastructure/troubleshooting/"
                         }
-                ],
-                collapsed: true
+                ]
         },
         {
                 label: "Governance",
@@ -372,8 +386,11 @@ export default defineConfig({
         },
         {
                 label: "Documentation Hub",
-                link: "/documentation/",
                 items: [
+                        {
+                                label: "Overview",
+                                link: "/documentation/"
+                        },
                         {
                                 label: "Contributing",
                                 link: "/documentation/contributing/"
@@ -382,8 +399,7 @@ export default defineConfig({
                                 label: "Tech Stack",
                                 link: "/documentation/tech-stack/"
                         }
-                ],
-                collapsed: true
+                ]
         },
         {
                 label: "CMU Courses Internet Archive",
@@ -391,8 +407,11 @@ export default defineConfig({
         },
         {
                 label: "Courses",
-                link: "/courses/",
                 items: [
+                        {
+                                label: "Overview",
+                                link: "/courses/"
+                        },
                         {
                                 label: "Src",
                                 items: [
@@ -448,8 +467,7 @@ export default defineConfig({
                                         }
                                 ]
                         }
-                ],
-                collapsed: true
+                ]
         }
 ],
       head: [

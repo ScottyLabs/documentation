@@ -81,17 +81,23 @@ async function generateProjectSection(project: Project): Promise<SidebarGroup | 
     // Build items manually excluding index files so README is only accessible via title link
     const items = await buildSidebarItems(project.slug, projectDocsPath);
     
-    // The link property makes the title clickable (goes to README/index.md)
-    // Items list shows docs from docs/ directory, excluding the index
     const sidebarGroup: SidebarGroup = {
       label: await sidebarGroupLabel(project),
-      link: `/${project.slug}/`,
     };
     
-    // Only add items and collapsed if there are sub-items
     if (items.length > 0) {
-      sidebarGroup.items = items;
-      sidebarGroup.collapsed = true;
+      // When there are sub-items, add the homepage as the first item
+      // Starlight doesn't allow both 'link' and 'items' at the same level
+      sidebarGroup.items = [
+        {
+          label: 'Overview',
+          link: `/${project.slug}/`,
+        },
+        ...items,
+      ];
+    } else {
+      // When there are no sub-items, just link directly
+      sidebarGroup.link = `/${project.slug}/`;
     }
     
     return sidebarGroup;
