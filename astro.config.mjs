@@ -71,7 +71,8 @@ export default defineConfig({
                 ]
         },
         {
-                label: "ScottyLabs",
+                label: "ScottyLabs Documentation Hub",
+                link: "/scottylabs/",
                 autogenerate: {
                         directory: "scottylabs",
                         collapsed: true
@@ -79,7 +80,26 @@ export default defineConfig({
                 collapsed: true
         },
         {
+                label: "Dalmatian",
+                link: "/dalmatian/",
+                autogenerate: {
+                        directory: "dalmatian",
+                        collapsed: true
+                },
+                collapsed: true
+        },
+        {
+                label: "CMUHousing",
+                link: "/housing/",
+                autogenerate: {
+                        directory: "housing",
+                        collapsed: true
+                },
+                collapsed: true
+        },
+        {
                 label: "Tartan Vote",
+                link: "/tartan-vote/",
                 autogenerate: {
                         directory: "tartan-vote",
                         collapsed: true
@@ -87,7 +107,8 @@ export default defineConfig({
                 collapsed: true
         },
         {
-                label: "Infrastructure",
+                label: "ScottyLabs Infrastructure",
+                link: "/infrastructure/",
                 autogenerate: {
                         directory: "infrastructure",
                         collapsed: true
@@ -95,15 +116,8 @@ export default defineConfig({
                 collapsed: true
         },
         {
-                label: "Governance",
-                autogenerate: {
-                        directory: "governance",
-                        collapsed: true
-                },
-                collapsed: true
-        },
-        {
-                label: "Documentation Hub",
+                label: "ScottyLabs Documentation Hub",
+                link: "/documentation/",
                 autogenerate: {
                         directory: "documentation",
                         collapsed: true
@@ -112,6 +126,7 @@ export default defineConfig({
         },
         {
                 label: "Courses",
+                link: "/courses/",
                 autogenerate: {
                         directory: "courses",
                         collapsed: true

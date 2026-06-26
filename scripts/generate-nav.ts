@@ -78,10 +78,12 @@ async function generateProjectSection(project: Project): Promise<SidebarGroup | 
       return null;
     }
 
+    // The link property makes the title clickable (goes to README/index.md)
     // autogenerate keeps nested pages in sync; collapsed: true keeps sections closed
     // on first visit except for the group containing the current page.
     return {
       label: await sidebarGroupLabel(project),
+      link: `/${project.slug}/`,
       autogenerate: { directory: project.slug, collapsed: true },
       collapsed: true,
     };
