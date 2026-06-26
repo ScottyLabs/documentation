@@ -27,8 +27,8 @@ let aggregationRedirects: Redirect[] = [];
 /** mdBook and similar tools use these as navigation metadata, not pages. */
 const SKIPPED_MARKDOWN_FILES = new Set(['SUMMARY.md', 'SUMMARY.mdx']);
 
-/** Homepage files that should be skipped from docs/ since README.md is used as the homepage. */
-const SKIPPED_INDEX_FILES = new Set(['index.md', 'index.mdx', 'README.md', 'readme.md']);
+/** README files in docs/ should be skipped since we use the root README as fallback homepage. */
+const SKIPPED_INDEX_FILES = new Set(['README.md', 'readme.md']);
 
 /** AI agent context ([agents.md](https://agents.md/)); repo-local only, not published pages. */
 const SKIPPED_AGENT_FILES = new Set(['AGENTS.md']);
@@ -83,19 +83,26 @@ async function aggregateProjectDocs(project: Project): Promise<void> {
   await rm(targetDocs, { recursive: true, force: true });
   await mkdir(targetDocs, { recursive: true });
   
-  // First, copy README.md from repo root as the homepage (index.md)
-  const readmePath = join(repoPath, 'README.md');
-  try {
-    await stat(readmePath);
-    const indexPath = join(targetDocs, 'index.md');
-    await processMarkdownFile(readmePath, indexPath, project, 'README.md');
-    console.log(`  ✓ Using README.md as homepage for ${project.name}`);
-  } catch {
-    console.warn(`  ⚠️  No README.md found at ${readmePath}, skipping homepage`);
-  }
-  
-  // Then copy all markdown files from docs directory
+  // Copy all markdown files from docs directory first
   await copyMarkdownFiles(sourceDocs, targetDocs, project);
+  
+  // Check if docs directory already has an index file
+  const hasIndex = await hasIndexFile(targetDocs);
+  
+  if (!hasIndex) {
+    // If no index exists, use README.md from repo root as the homepage
+    const readmePath = join(repoPath, 'README.md');
+    try {
+      await stat(readmePath);
+      const indexPath = join(targetDocs, 'index.md');
+      await processMarkdownFile(readmePath, indexPath, project, 'README.md');
+      console.log(`  ✓ Using README.md as homepage for ${project.name}`);
+    } catch {
+      console.warn(`  ⚠️  No README.md found at ${readmePath}, skipping homepage`);
+    }
+  } else {
+    console.log(`  ✓ Using existing index.md as homepage for ${project.name}`);
+  }
   
   console.log(`  ✓ ${project.name} docs copied to ${targetDocs}`);
 }
@@ -131,6 +138,21 @@ async function copyMarkdownFiles(
       await processMarkdownFile(sourcePath, targetPath, project, normalizedRelativePath);
     }
   }
+}
+
+/**
+ * Check if a directory has an index.md or index.mdx file
+ */
+async function hasIndexFile(dir: string): Promise<boolean> {
+  for (const filename of ['index.md', 'index.mdx']) {
+    try {
+      await stat(join(dir, filename));
+      return true;
+    } catch {
+      continue;
+    }
+  }
+  return false;
 }
 
 function isAggregateableMarkdown(name: string, project: Project): boolean {

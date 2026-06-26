@@ -71,7 +71,7 @@ export default defineConfig({
                 ]
         },
         {
-                label: "ScottyLabs Documentation Hub",
+                label: "ScottyLabs",
                 link: "/scottylabs/",
                 items: [
                         {
@@ -327,7 +327,7 @@ export default defineConfig({
                 collapsed: true
         },
         {
-                label: "ScottyLabs Documentation Hub",
+                label: "Documentation Hub",
                 link: "/documentation/",
                 items: [
                         {
