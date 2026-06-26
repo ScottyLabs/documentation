@@ -86,15 +86,12 @@ async function generateProjectSection(project: Project): Promise<SidebarGroup | 
     };
     
     if (items.length > 0) {
-      // When there are sub-items, add the homepage as the first item
-      // Starlight doesn't allow both 'link' and 'items' at the same level
-      sidebarGroup.items = [
-        {
-          label: 'Overview',
-          link: `/${project.slug}/`,
-        },
-        ...items,
-      ];
+      // Use autogenerate to make title clickable while showing sub-items
+      // This automatically links the title to index.md and expands to show other files
+      sidebarGroup.autogenerate = {
+        directory: project.slug,
+        collapsed: true,
+      };
     } else {
       // When there are no sub-items, just link directly
       sidebarGroup.link = `/${project.slug}/`;
