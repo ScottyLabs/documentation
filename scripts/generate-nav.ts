@@ -78,13 +78,15 @@ async function generateProjectSection(project: Project): Promise<SidebarGroup | 
       return null;
     }
 
+    // Build items manually excluding index files so README is only accessible via title link
+    const items = await buildSidebarItems(project.slug, projectDocsPath);
+    
     // The link property makes the title clickable (goes to README/index.md)
-    // autogenerate keeps nested pages in sync; collapsed: true keeps sections closed
-    // on first visit except for the group containing the current page.
+    // Items list shows docs from docs/ directory, excluding the index
     return {
       label: await sidebarGroupLabel(project),
       link: `/${project.slug}/`,
-      autogenerate: { directory: project.slug, collapsed: true },
+      items: items.length > 0 ? items : undefined,
       collapsed: true,
     };
   }
@@ -128,6 +130,60 @@ async function directoryHasMarkdown(dir: string): Promise<boolean> {
     }
   }
   return false;
+}
+
+/**
+ * Build sidebar items for a directory, excluding index files
+ */
+async function buildSidebarItems(projectSlug: string, dir: string, relativePath = ''): Promise<SidebarItem[]> {
+  const entries = await readdir(dir, { withFileTypes: true });
+  const items: SidebarItem[] = [];
+  
+  for (const entry of entries) {
+    const fullPath = join(dir, entry.name);
+    const itemPath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
+    
+    if (entry.isDirectory()) {
+      const subItems = await buildSidebarItems(projectSlug, fullPath, itemPath);
+      if (subItems.length > 0) {
+        items.push({
+          label: formatLabel(entry.name),
+          items: subItems,
+        });
+      }
+    } else if (entry.isFile() && (entry.name.endsWith('.md') || entry.name.endsWith('.mdx'))) {
+      // Skip index files - they're accessible via the section title link
+      if (entry.name === 'index.md' || entry.name === 'index.mdx') {
+        continue;
+      }
+      
+      const nameWithoutExt = entry.name.replace(/\.(md|mdx)$/, '');
+      const link = `/${projectSlug}/${relativePath ? relativePath + '/' : ''}${nameWithoutExt}/`;
+      
+      items.push({
+        label: formatLabel(nameWithoutExt),
+        link,
+      });
+    }
+  }
+  
+  // Sort: directories first, then files, both alphabetically
+  items.sort((a, b) => {
+    const aIsDir = 'items' in a;
+    const bIsDir = 'items' in b;
+    if (aIsDir && !bIsDir) return -1;
+    if (!aIsDir && bIsDir) return 1;
+    return a.label.localeCompare(b.label);
+  });
+  
+  return items;
+}
+
+function formatLabel(name: string): string {
+  return name
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 }
 
 function titleFromFrontmatter(content: string): string | undefined {

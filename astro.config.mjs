@@ -73,64 +73,334 @@ export default defineConfig({
         {
                 label: "ScottyLabs Documentation Hub",
                 link: "/scottylabs/",
-                autogenerate: {
-                        directory: "scottylabs",
-                        collapsed: true
-                },
+                items: [
+                        {
+                                label: "Community",
+                                items: [
+                                        {
+                                                label: "Communication",
+                                                link: "/scottylabs/community/communication/"
+                                        },
+                                        {
+                                                label: "Resources",
+                                                link: "/scottylabs/community/resources/"
+                                        }
+                                ]
+                        },
+                        {
+                                label: "Design",
+                                items: [
+                                        {
+                                                label: "Design System",
+                                                link: "/scottylabs/design/design-system/"
+                                        },
+                                        {
+                                                label: "Diagramming",
+                                                link: "/scottylabs/design/diagramming/"
+                                        }
+                                ]
+                        },
+                        {
+                                label: "Development",
+                                items: [
+                                        {
+                                                label: "Ai Code Reviewers",
+                                                link: "/scottylabs/development/ai-code-reviewers/"
+                                        },
+                                        {
+                                                label: "Deprecation Guideline",
+                                                link: "/scottylabs/development/deprecation-guideline/"
+                                        },
+                                        {
+                                                label: "Git Best Practices",
+                                                link: "/scottylabs/development/git-best-practices/"
+                                        },
+                                        {
+                                                label: "Pr Process",
+                                                link: "/scottylabs/development/pr-process/"
+                                        }
+                                ]
+                        },
+                        {
+                                label: "Onboarding",
+                                items: [
+                                        {
+                                                label: "Codeberg Setup",
+                                                link: "/scottylabs/onboarding/codeberg-setup/"
+                                        },
+                                        {
+                                                label: "Contributing",
+                                                link: "/scottylabs/onboarding/contributing/"
+                                        },
+                                        {
+                                                label: "Labrador To Tech",
+                                                link: "/scottylabs/onboarding/labrador-to-tech/"
+                                        }
+                                ]
+                        },
+                        {
+                                label: "Organization",
+                                items: [
+                                        {
+                                                label: "Projects",
+                                                link: "/scottylabs/organization/projects/"
+                                        }
+                                ]
+                        },
+                        {
+                                label: "Platform",
+                                items: [
+                                        {
+                                                label: "Credentials",
+                                                link: "/scottylabs/platform/credentials/"
+                                        },
+                                        {
+                                                label: "Emails",
+                                                link: "/scottylabs/platform/emails/"
+                                        },
+                                        {
+                                                label: "Github Orgs",
+                                                link: "/scottylabs/platform/github-orgs/"
+                                        }
+                                ]
+                        }
+                ],
                 collapsed: true
         },
         {
                 label: "Dalmatian",
                 link: "/dalmatian/",
-                autogenerate: {
-                        directory: "dalmatian",
-                        collapsed: true
-                },
+                items: [
+                        {
+                                label: "Contributing",
+                                link: "/dalmatian/contributing/"
+                        },
+                        {
+                                label: "Setup",
+                                link: "/dalmatian/setup/"
+                        }
+                ],
                 collapsed: true
         },
         {
                 label: "CMUHousing",
                 link: "/housing/",
-                autogenerate: {
-                        directory: "housing",
-                        collapsed: true
-                },
+                items: [
+                        {
+                                label: "Contributing",
+                                link: "/housing/contributing/"
+                        },
+                        {
+                                label: "Setup",
+                                link: "/housing/setup/"
+                        }
+                ],
                 collapsed: true
         },
         {
                 label: "Tartan Vote",
                 link: "/tartan-vote/",
-                autogenerate: {
-                        directory: "tartan-vote",
-                        collapsed: true
-                },
+                items: [
+                        {
+                                label: "Crates",
+                                items: [
+                                        {
+                                                label: "Voting App",
+                                                items: [
+                                                        {
+                                                                label: "Auth",
+                                                                link: "/tartan-vote/crates/voting-app/auth/"
+                                                        },
+                                                        {
+                                                                label: "Fonts",
+                                                                link: "/tartan-vote/crates/voting-app/fonts/"
+                                                        }
+                                                ]
+                                        }
+                                ]
+                        },
+                        {
+                                label: "Db",
+                                items: [
+                                        {
+                                                label: "Db Json",
+                                                link: "/tartan-vote/db/db-json/"
+                                        },
+                                        {
+                                                label: "Db Migration",
+                                                link: "/tartan-vote/db/db-migration/"
+                                        },
+                                        {
+                                                label: "Db Schema",
+                                                link: "/tartan-vote/db/db-schema/"
+                                        }
+                                ]
+                        },
+                        {
+                                label: "Frontend",
+                                items: [
+                                        {
+                                                label: "Proxy Setup Debug",
+                                                link: "/tartan-vote/frontend/proxy-setup-debug/"
+                                        }
+                                ]
+                        },
+                        {
+                                label: "Process",
+                                items: [
+                                        {
+                                                label: "Proxy Voting Implementation",
+                                                link: "/tartan-vote/process/proxy-voting-implementation/"
+                                        },
+                                        {
+                                                label: "Proxy Voting Testing",
+                                                link: "/tartan-vote/process/proxy-voting-testing/"
+                                        }
+                                ]
+                        },
+                        {
+                                label: "Contributing",
+                                link: "/tartan-vote/contributing/"
+                        },
+                        {
+                                label: "Secrets And Config",
+                                link: "/tartan-vote/secrets-and-config/"
+                        },
+                        {
+                                label: "Setup",
+                                link: "/tartan-vote/setup/"
+                        }
+                ],
                 collapsed: true
         },
         {
                 label: "ScottyLabs Infrastructure",
                 link: "/infrastructure/",
-                autogenerate: {
-                        directory: "infrastructure",
-                        collapsed: true
-                },
+                items: [
+                        {
+                                label: "Secrets",
+                                items: [
+                                        {
+                                                label: "01 Creating Secrets",
+                                                link: "/infrastructure/secrets/01-creating-secrets/"
+                                        },
+                                        {
+                                                label: "02 Using Secrets",
+                                                link: "/infrastructure/secrets/02-using-secrets/"
+                                        },
+                                        {
+                                                label: "03 Openbao",
+                                                link: "/infrastructure/secrets/03-openbao/"
+                                        }
+                                ]
+                        },
+                        {
+                                label: "Setup",
+                                items: [
+                                        {
+                                                label: "01 Purchasing Vm",
+                                                link: "/infrastructure/setup/01-purchasing-vm/"
+                                        },
+                                        {
+                                                label: "02 Preparing For Setup",
+                                                link: "/infrastructure/setup/02-preparing-for-setup/"
+                                        },
+                                        {
+                                                label: "03 Installing Nixos",
+                                                link: "/infrastructure/setup/03-installing-nixos/"
+                                        },
+                                        {
+                                                label: "04 Post Installation Setup",
+                                                link: "/infrastructure/setup/04-post-installation-setup/"
+                                        }
+                                ]
+                        },
+                        {
+                                label: "Create User Entry",
+                                link: "/infrastructure/create-user-entry/"
+                        },
+                        {
+                                label: "Troubleshooting",
+                                link: "/infrastructure/troubleshooting/"
+                        }
+                ],
                 collapsed: true
         },
         {
                 label: "ScottyLabs Documentation Hub",
                 link: "/documentation/",
-                autogenerate: {
-                        directory: "documentation",
-                        collapsed: true
-                },
+                items: [
+                        {
+                                label: "Contributing",
+                                link: "/documentation/contributing/"
+                        },
+                        {
+                                label: "Tech Stack",
+                                link: "/documentation/tech-stack/"
+                        }
+                ],
                 collapsed: true
         },
         {
                 label: "Courses",
                 link: "/courses/",
-                autogenerate: {
-                        directory: "courses",
-                        collapsed: true
-                },
+                items: [
+                        {
+                                label: "Src",
+                                items: [
+                                        {
+                                                label: "Courses Index",
+                                                items: [
+                                                        {
+                                                                label: "Catalog Format",
+                                                                link: "/courses/src/courses-index/catalog-format/"
+                                                        },
+                                                        {
+                                                                label: "Facets",
+                                                                link: "/courses/src/courses-index/facets/"
+                                                        },
+                                                        {
+                                                                label: "Query",
+                                                                link: "/courses/src/courses-index/query/"
+                                                        },
+                                                        {
+                                                                label: "Text Search",
+                                                                link: "/courses/src/courses-index/text-search/"
+                                                        }
+                                                ]
+                                        },
+                                        {
+                                                label: "Scraper",
+                                                items: [
+                                                        {
+                                                                label: "Discovery",
+                                                                link: "/courses/src/scraper/discovery/"
+                                                        },
+                                                        {
+                                                                label: "Programs",
+                                                                link: "/courses/src/scraper/programs/"
+                                                        },
+                                                        {
+                                                                label: "Running",
+                                                                link: "/courses/src/scraper/running/"
+                                                        },
+                                                        {
+                                                                label: "Stellic",
+                                                                link: "/courses/src/scraper/stellic/"
+                                                        },
+                                                        {
+                                                                label: "Syllabi",
+                                                                link: "/courses/src/scraper/syllabi/"
+                                                        }
+                                                ]
+                                        },
+                                        {
+                                                label: "Overview",
+                                                link: "/courses/src/overview/"
+                                        }
+                                ]
+                        }
+                ],
                 collapsed: true
         }
 ],
