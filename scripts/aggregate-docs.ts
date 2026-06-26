@@ -72,19 +72,22 @@ async function aggregateProjectDocs(project: Project): Promise<void> {
   }
   
   // Check if docs directory exists
+  let hasDocsDir = false;
   try {
     await stat(sourceDocs);
+    hasDocsDir = true;
   } catch {
-    console.warn(`  ⚠️  No docs directory found at ${sourceDocs}`);
-    return;
+    // No docs directory - that's okay, we'll just use README if available
   }
   
   // Replace project docs each build so renamed/lowercased files do not linger.
   await rm(targetDocs, { recursive: true, force: true });
   await mkdir(targetDocs, { recursive: true });
   
-  // Copy all markdown files from docs directory first
-  await copyMarkdownFiles(sourceDocs, targetDocs, project);
+  // Copy all markdown files from docs directory if it exists
+  if (hasDocsDir) {
+    await copyMarkdownFiles(sourceDocs, targetDocs, project);
+  }
   
   // Check if docs directory already has an index file
   const hasIndex = await hasIndexFile(targetDocs);
@@ -98,6 +101,10 @@ async function aggregateProjectDocs(project: Project): Promise<void> {
       await processMarkdownFile(readmePath, indexPath, project, 'README.md');
       console.log(`  ✓ Using README.md as homepage for ${project.name}`);
     } catch {
+      if (!hasDocsDir) {
+        console.warn(`  ⚠️  No docs directory or README.md found for ${project.name}`);
+        return;
+      }
       console.warn(`  ⚠️  No README.md found at ${readmePath}, skipping homepage`);
     }
   } else {

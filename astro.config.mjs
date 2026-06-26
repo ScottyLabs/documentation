@@ -168,6 +168,16 @@ export default defineConfig({
                 collapsed: true
         },
         {
+                label: "Bus Sign",
+                link: "/bus-sign/",
+                collapsed: true
+        },
+        {
+                label: "groupme-mirror",
+                link: "/groupme-mirror/",
+                collapsed: true
+        },
+        {
                 label: "Dalmatian",
                 link: "/dalmatian/",
                 items: [
@@ -180,6 +190,41 @@ export default defineConfig({
                                 link: "/dalmatian/setup/"
                         }
                 ],
+                collapsed: true
+        },
+        {
+                label: "Discord Verify",
+                link: "/discord-verify/",
+                collapsed: true
+        },
+        {
+                label: "@scottylabs/components",
+                link: "/components/",
+                collapsed: true
+        },
+        {
+                label: "Terrier",
+                link: "/terrier/",
+                collapsed: true
+        },
+        {
+                label: "ScottyStack",
+                link: "/cmugpt-surface/",
+                collapsed: true
+        },
+        {
+                label: "Python Template",
+                link: "/cmugpt-agent/",
+                collapsed: true
+        },
+        {
+                label: "ScottyLabs MCPs",
+                link: "/mcp-server/",
+                collapsed: true
+        },
+        {
+                label: "cmugpt-sms-surface",
+                link: "/cmugpt-sms-surface/",
                 collapsed: true
         },
         {
@@ -327,6 +372,16 @@ export default defineConfig({
                 collapsed: true
         },
         {
+                label: "Governance",
+                link: "/governance/",
+                collapsed: true
+        },
+        {
+                label: "observability",
+                link: "/observability/",
+                collapsed: true
+        },
+        {
                 label: "Documentation Hub",
                 link: "/documentation/",
                 items: [
@@ -339,6 +394,11 @@ export default defineConfig({
                                 link: "/documentation/tech-stack/"
                         }
                 ],
+                collapsed: true
+        },
+        {
+                label: "CMU Courses Internet Archive",
+                link: "/internet-archive/",
                 collapsed: true
         },
         {
