@@ -83,12 +83,18 @@ async function generateProjectSection(project: Project): Promise<SidebarGroup | 
     
     // The link property makes the title clickable (goes to README/index.md)
     // Items list shows docs from docs/ directory, excluding the index
-    return {
+    const sidebarGroup: SidebarGroup = {
       label: await sidebarGroupLabel(project),
       link: `/${project.slug}/`,
-      items: items.length > 0 ? items : undefined,
-      collapsed: true,
     };
+    
+    // Only add items and collapsed if there are sub-items
+    if (items.length > 0) {
+      sidebarGroup.items = items;
+      sidebarGroup.collapsed = true;
+    }
+    
+    return sidebarGroup;
   }
 
   const items: SidebarItem[] = [];

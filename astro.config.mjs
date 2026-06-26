@@ -169,13 +169,11 @@ export default defineConfig({
         },
         {
                 label: "Bus Sign",
-                link: "/bus-sign/",
-                collapsed: true
+                link: "/bus-sign/"
         },
         {
                 label: "groupme-mirror",
-                link: "/groupme-mirror/",
-                collapsed: true
+                link: "/groupme-mirror/"
         },
         {
                 label: "Dalmatian",
@@ -194,38 +192,31 @@ export default defineConfig({
         },
         {
                 label: "Discord Verify",
-                link: "/discord-verify/",
-                collapsed: true
+                link: "/discord-verify/"
         },
         {
                 label: "@scottylabs/components",
-                link: "/components/",
-                collapsed: true
+                link: "/components/"
         },
         {
                 label: "Terrier",
-                link: "/terrier/",
-                collapsed: true
+                link: "/terrier/"
         },
         {
                 label: "ScottyStack",
-                link: "/cmugpt-surface/",
-                collapsed: true
+                link: "/cmugpt-surface/"
         },
         {
                 label: "Python Template",
-                link: "/cmugpt-agent/",
-                collapsed: true
+                link: "/cmugpt-agent/"
         },
         {
                 label: "ScottyLabs MCPs",
-                link: "/mcp-server/",
-                collapsed: true
+                link: "/mcp-server/"
         },
         {
                 label: "cmugpt-sms-surface",
-                link: "/cmugpt-sms-surface/",
-                collapsed: true
+                link: "/cmugpt-sms-surface/"
         },
         {
                 label: "CMUHousing",
@@ -373,13 +364,11 @@ export default defineConfig({
         },
         {
                 label: "Governance",
-                link: "/governance/",
-                collapsed: true
+                link: "/governance/"
         },
         {
                 label: "observability",
-                link: "/observability/",
-                collapsed: true
+                link: "/observability/"
         },
         {
                 label: "Documentation Hub",
@@ -398,8 +387,7 @@ export default defineConfig({
         },
         {
                 label: "CMU Courses Internet Archive",
-                link: "/internet-archive/",
-                collapsed: true
+                link: "/internet-archive/"
         },
         {
                 label: "Courses",
