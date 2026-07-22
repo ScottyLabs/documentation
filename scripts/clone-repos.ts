@@ -40,8 +40,13 @@ async function resolveProjectRepoRoot(project: Project): Promise<void> {
     return;
   }
 
-  await ensureRepoCloned(project.repo, project.slug, project.name);
-  resolvedRepoRoots.set(project.slug, getRepoPath(project.slug));
+  try {
+    await ensureRepoCloned(project.repo, project.slug, project.name);
+    resolvedRepoRoots.set(project.slug, getRepoPath(project.slug));
+  } catch (err) {
+    // Private repos or no network: skip gracefully so local dev still produces a site
+    console.warn(`  ⚠️  Skipping ${project.name} (${project.slug}): ${(err as Error).message.split('\n')[0]}`);
+  }
 }
 
 async function isUsableCheckout(path: string): Promise<boolean> {
@@ -87,6 +92,8 @@ export async function ensureRepoCloned(
     {
       stdout: 'pipe',
       stderr: 'pipe',
+      stdin: 'null',
+      env: { ...process.env, GIT_TERMINAL_PROMPT: '0' },
     }
   );
 

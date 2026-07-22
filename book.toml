@@ -1,0 +1,28 @@
+[book]
+title = "ScottyLabs Docs"
+authors = ["ScottyLabs"]
+language = "en"
+src = "src/content/docs"
+
+[output.html]
+no-section-label = true
+fold.enable = true
+fold.level = 1
+default-theme = "navy"
+preferred-dark-theme = "navy"
+additional-css = ["theme/scottylabs.css"]
+additional-js  = ["theme/sidebar-logo.js"]
+
+[preprocessor.quote]
+command = "python3 scripts/mdbook-quote.py"
+
+[preprocessor.mermaid]
+command = "mdbook-mermaid"
+supports-html-renderer = true
+
+[output.html.search]
+enable = true
+
+[build]
+build-dir = "book"
+create-missing = false

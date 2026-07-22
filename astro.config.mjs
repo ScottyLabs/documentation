@@ -150,6 +150,10 @@ export default defineConfig({
                 link: "/governance/"
         },
         {
+                label: "devenv",
+                link: "/devenv/"
+        },
+        {
                 label: "observability",
                 link: "/observability/"
         },
@@ -165,7 +169,7 @@ export default defineConfig({
                 link: "/internet-archive/"
         },
         {
-                label: "Courses",
+                label: "CMU Courses",
                 autogenerate: {
                         directory: "courses",
                         collapsed: true

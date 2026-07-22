@@ -20,22 +20,19 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
+      - name: Install Nix
+        uses: https://github.com/DeterminateSystems/nix-installer-action@v16
 
       - name: Install dependencies
         run: bun install
 
       - name: Build documentation
-        run: bun run build
+        run: nix shell nixpkgs#mdbook nixpkgs#mdbook-mermaid --command bun run build
         env:
           NODE_ENV: production
 
-      - name: Install Nix
-        if: github.ref == 'refs/heads/main'
-        uses: https://github.com/DeterminateSystems/nix-installer-action@v16
+
+
 
       - name: Upload to Garage
         if: github.ref == 'refs/heads/main'
@@ -69,19 +66,17 @@ jobs:
             exit 1
           fi
 
-          nix shell nixpkgs#awscli2 --command aws s3 sync dist/ "s3://${GARAGE_BUCKET}/" \
+          nix shell nixpkgs#awscli2 --command aws s3 sync book/ "s3://${GARAGE_BUCKET}/" \
             --endpoint-url "${GARAGE_ENDPOINT}" \
             --region us-east-1 \
             --delete \
             --exclude "*.html" \
-            --exclude "*.md" \
             --cache-control "public, max-age=31536000, immutable"
 
-          nix shell nixpkgs#awscli2 --command aws s3 sync dist/ "s3://${GARAGE_BUCKET}/" \
+          nix shell nixpkgs#awscli2 --command aws s3 sync book/ "s3://${GARAGE_BUCKET}/" \
             --endpoint-url "${GARAGE_ENDPOINT}" \
             --region us-east-1 \
             --delete \
             --exclude "*" \
             --include "*.html" \
-            --include "*.md" \
             --cache-control "public, max-age=0, must-revalidate"

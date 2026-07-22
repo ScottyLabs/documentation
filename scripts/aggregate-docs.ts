@@ -34,7 +34,7 @@ const SKIPPED_INDEX_FILES = new Set(['README.md', 'readme.md']);
 const SKIPPED_AGENT_FILES = new Set(['AGENTS.md']);
 
 /** Starlight site shell, not project documentation. */
-const SKIPPED_SHELL_FILES = new Set(['index.mdx', 'getting-started.md', '404.md']);
+const SKIPPED_SHELL_FILES = new Set(['index.md', 'getting-started.md', '404.md']);
 
 /**
  * Aggregate documentation from all Starlight projects
@@ -163,9 +163,8 @@ async function hasIndexFile(dir: string): Promise<boolean> {
 }
 
 function isAggregateableMarkdown(name: string, project: Project): boolean {
-  if (!name.endsWith('.md') && !name.endsWith('.mdx')) {
-    return false;
-  }
+  // mdx files use JSX syntax mdbook cannot render; skip them
+  if (!name.endsWith('.md')) return false;
   if (SKIPPED_MARKDOWN_FILES.has(name) || SKIPPED_AGENT_FILES.has(name) || SKIPPED_INDEX_FILES.has(name)) {
     return false;
   }
@@ -262,22 +261,37 @@ async function processMarkdownFile(
   sourceRelativePath: string
 ): Promise<void> {
   const content = await Bun.file(sourcePath).text();
-  const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n/);
-
-  const existingFrontmatter = frontmatterMatch?.[1] ?? '';
+  // Strip any YAML frontmatter — mdbook renders it as literal text
+  const frontmatterMatch = content.match(/^---\n[\s\S]*?\n---\n/);
   const rawBody = frontmatterMatch ? content.slice(frontmatterMatch[0].length) : content;
+
   const body = rewriteMarkdownLinks(rawBody, {
     projectSlug: project.slug,
     repo: project.repo,
     docsDir: resolveProjectDocsDir(project),
     sourceRelativePath,
   });
-  const title =
-    titleFromFrontmatter(existingFrontmatter) ?? deriveTitle(body, basename(sourcePath));
-  const frontmatter = buildFrontmatter(existingFrontmatter, title, project);
-  const trimmedBody = stripLeadingDuplicateH1(body, title);
 
-  await Bun.write(targetPath, `---\n${frontmatter}\n---\n${trimmedBody}`);
+  const srcBase = basename(sourcePath).replace(/\.(md|mdx)$/, '').toLowerCase();
+  const isRootFile = srcBase === 'index' || srcBase === 'readme';
+
+  let finalBody = body;
+  let preamble: string;
+
+  if (isRootFile) {
+    // Root pages: strip any existing markdown H1 and leading HTML title blocks
+    // (e.g. <div align="center"><h1>...</h1></div> common in GitHub READMEs),
+    // then inject the canonical project name as the page heading.
+    finalBody = body
+      .replace(/^#\s+.+?(?:\s*\{#[^}]*\})?\s*\n/, '')       // markdown H1
+      .replace(/^\s*<div[^>]*>[\s\S]*?<\/div>\s*\n*/i, '')   // HTML title div
+      .replace(/^\n+/, '');
+    preamble = `# ${project.name}\n\n`;
+  } else {
+    preamble = /^#\s+/m.test(body) ? '' : `# ${deriveTitle(body, basename(sourcePath))}\n\n`;
+  }
+
+  await Bun.write(targetPath, preamble + finalBody);
 }
 
 /**

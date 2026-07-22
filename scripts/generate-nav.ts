@@ -1,6 +1,7 @@
 /**
- * Navigation generation utilities
- * Dynamically generates Starlight sidebar from project manifest
+ * Navigation generation — writes src/content/docs/SUMMARY.md for mdbook.
+ * Organisation mirrors the old Starlight sidebar: scottylabs slug is promoted
+ * first, then all other starlight-type projects in discovery order.
  */
 
 import { writeFile, stat } from 'node:fs/promises';
@@ -10,316 +11,162 @@ import type { Project } from './manifest.ts';
 
 const CONTENT_DIR = 'src/content/docs';
 
-interface SidebarItem {
-  label: string;
-  link?: string;
-  autogenerate?: { directory: string; collapsed?: boolean };
-  items?: SidebarItem[];
-}
-
-interface SidebarGroup {
-  label: string;
-  items?: SidebarItem[];
-  autogenerate?: { directory: string; collapsed?: boolean };
-  collapsed?: boolean;
-}
-
 /**
- * Generate dynamic sidebar configuration
+ * Generate SUMMARY.md from the aggregated project docs.
  */
 export async function generateNavigation(projects: Project[]): Promise<void> {
-  console.log(`\n🧭 Generating navigation...\n`);
-  
-  const sidebar: (SidebarGroup | SidebarItem)[] = [
-    {
-      label: 'Welcome',
-      collapsed: true,
-      items: [
-        { label: 'Home', link: '/' },
-        { label: 'Getting Started', link: '/getting-started/' },
-      ],
-    },
-  ];
-  
-  // Add project sections (ScottyLabs org docs first, then everything else)
-  const sortedProjects = [...projects].sort((a, b) => {
+  console.log(`\n🧭 Generating SUMMARY.md...\n`);
+
+  const lines: string[] = ['# Summary', ''];
+
+  // Welcome section — shell pages at the content root
+  lines.push('- [Home](index.md)');
+  try {
+    await stat(join(CONTENT_DIR, 'getting-started.md'));
+    lines.push('- [Getting Started](getting-started.md)');
+  } catch { /* file absent */ }
+  lines.push('');
+  lines.push('---');
+  lines.push('');
+
+  // scottylabs org docs first, then everything else in discovery order
+  const sorted = [...projects].sort((a, b) => {
     if (a.slug === 'scottylabs') return -1;
     if (b.slug === 'scottylabs') return 1;
     return 0;
   });
 
-  for (const project of sortedProjects) {
-    const projectSection = await generateProjectSection(project);
-    if (projectSection) {
-      sidebar.push(projectSection);
-    }
+  for (const project of sorted) {
+    const entry = await projectEntry(project);
+    if (entry) lines.push(entry);
   }
-  
-  // Write updated astro.config.mjs
-  await writeAstroConfig(sidebar);
-  
-  console.log('✅ Navigation generated\n');
+
+  const summary = lines.join('\n') + '\n';
+  await writeFile(join(CONTENT_DIR, 'SUMMARY.md'), summary);
+  console.log('✅ SUMMARY.md generated\n');
 }
 
-/**
- * Generate sidebar section for a single project
- */
-async function generateProjectSection(project: Project): Promise<SidebarGroup | null> {
-  if (project.type === 'starlight') {
-    const projectDocsPath = join(CONTENT_DIR, project.slug);
-    try {
-      await stat(projectDocsPath);
-    } catch {
-      return null;
-    }
+// ── Per-project entry ──────────────────────────────────────────────────────
 
-    const hasDocs = await directoryHasMarkdown(projectDocsPath);
-    if (!hasDocs) {
-      return null;
-    }
+async function projectEntry(project: Project): Promise<string | null> {
+  // Only starlight-type projects have aggregated markdown pages
+  if (project.type !== 'starlight') return null;
 
-    // Build items manually excluding index files so README is only accessible via title link
-    const items = await buildSidebarItems(project.slug, projectDocsPath);
-    
-    const sidebarGroup: SidebarGroup = {
-      label: await sidebarGroupLabel(project),
-    };
-    
-    if (items.length > 0) {
-      // Use autogenerate to make title clickable while showing sub-items
-      // This automatically links the title to index.md and expands to show other files
-      sidebarGroup.autogenerate = {
-        directory: project.slug,
-        collapsed: true,
-      };
-    } else {
-      // When there are no sub-items, just link directly
-      sidebarGroup.link = `/${project.slug}/`;
-    }
-    
-    return sidebarGroup;
-  }
-
-  const items: SidebarItem[] = [];
-
-  if (project.type === 'openapi') {
-    items.push({
-      label: 'API Reference',
-      link: `/${project.slug}/api/`,
-    });
-  }
-
-  if (project.type === 'rust') {
-    items.push({
-      label: 'API Documentation',
-      link: `/${project.slug}/api/`,
-    });
-  }
-
-  if (items.length === 0) {
+  const dir = join(CONTENT_DIR, project.slug);
+  try {
+    await stat(dir);
+  } catch {
     return null;
   }
 
-  return {
-    label: project.name,
-    items,
-    collapsed: true,
-  };
+  if (!(await directoryHasMarkdown(dir))) return null;
+
+  const label = await sidebarGroupLabel(project);
+  const subLines = await summaryLines(project.slug, dir, '  ');
+
+  // If no index.md exists, emit a draft chapter (no link) to avoid mdbook errors
+  const hasIndex = await directoryHasIndex(dir);
+  const root = hasIndex
+    ? `- [${label}](${project.slug}/index.md)`
+    : `- [${label}]()`;
+  return subLines.length > 0 ? root + '\n' + subLines.join('\n') : root;
 }
 
-async function directoryHasMarkdown(dir: string): Promise<boolean> {
+// ── Recursive directory walker ─────────────────────────────────────────────
+
+/**
+ * Return SUMMARY.md lines for all markdown files under `dir`, skipping index
+ * files (they are the section root linked by the parent entry).
+ *
+ * @param slug      Project slug — used to build the path relative to CONTENT_DIR
+ * @param dir       Absolute or CWD-relative path to scan
+ * @param indent    Indentation prefix for this depth level
+ * @param relPath   Path relative to the project slug dir (for sub-dirs)
+ */
+async function summaryLines(
+  slug: string,
+  dir: string,
+  indent: string,
+  relPath = '',
+): Promise<string[]> {
   const entries = await readdir(dir, { withFileTypes: true });
-  for (const entry of entries) {
-    const path = join(dir, entry.name);
-    if (entry.isFile() && (entry.name.endsWith('.md') || entry.name.endsWith('.mdx'))) {
-      return true;
+  const lines: string[] = [];
+
+  // Directories first, then files, both alphabetical
+  const dirs = entries.filter(e => e.isDirectory()).sort((a, b) => a.name.localeCompare(b.name));
+  const files = entries
+    .filter(e => e.isFile() && (e.name.endsWith('.md') || e.name.endsWith('.mdx')))
+    .filter(e => e.name !== 'index.md' && e.name !== 'index.mdx')
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  for (const d of dirs) {
+    const subDir = join(dir, d.name);
+    const subRel = relPath ? `${relPath}/${d.name}` : d.name;
+    const hasIndex = await directoryHasIndex(subDir);
+    const subLines = await summaryLines(slug, subDir, indent + '  ', subRel);
+
+    const indexPath = `${slug}/${subRel}/index.md`;
+    const subLabel = formatLabel(d.name);
+
+    if (hasIndex) {
+      lines.push(`${indent}- [${subLabel}](${indexPath})`);
+    } else {
+      // Draft chapter — no index file, but has content below
+      lines.push(`${indent}- [${subLabel}]()`);
     }
-    if (entry.isDirectory() && (await directoryHasMarkdown(path))) {
-      return true;
-    }
+    lines.push(...subLines);
   }
+
+  for (const f of files) {
+    const nameNoExt = f.name.replace(/\.(md|mdx)$/, '');
+    const filePath = relPath
+      ? `${slug}/${relPath}/${nameNoExt}.md`
+      : `${slug}/${nameNoExt}.md`;
+    lines.push(`${indent}- [${formatLabel(nameNoExt)}](${filePath})`);
+  }
+
+  return lines;
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+async function directoryHasMarkdown(dir: string): Promise<boolean> {
+  try {
+    const entries = await readdir(dir, { withFileTypes: true });
+    for (const e of entries) {
+      if (e.isFile() && (e.name.endsWith('.md') || e.name.endsWith('.mdx'))) return true;
+      if (e.isDirectory() && (await directoryHasMarkdown(join(dir, e.name)))) return true;
+    }
+  } catch { /* dir absent */ }
   return false;
 }
 
-/**
- * Build sidebar items for a directory, excluding index files
- */
-async function buildSidebarItems(projectSlug: string, dir: string, relativePath = ''): Promise<SidebarItem[]> {
-  const entries = await readdir(dir, { withFileTypes: true });
-  const items: SidebarItem[] = [];
-  
-  for (const entry of entries) {
-    const fullPath = join(dir, entry.name);
-    const itemPath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
-    
-    if (entry.isDirectory()) {
-      const subItems = await buildSidebarItems(projectSlug, fullPath, itemPath);
-      if (subItems.length > 0) {
-        items.push({
-          label: formatLabel(entry.name),
-          items: subItems,
-        });
-      }
-    } else if (entry.isFile() && (entry.name.endsWith('.md') || entry.name.endsWith('.mdx'))) {
-      // Skip index files - they're accessible via the section title link
-      if (entry.name === 'index.md' || entry.name === 'index.mdx') {
-        continue;
-      }
-      
-      const nameWithoutExt = entry.name.replace(/\.(md|mdx)$/, '');
-      const link = `/${projectSlug}/${relativePath ? relativePath + '/' : ''}${nameWithoutExt}/`;
-      
-      items.push({
-        label: formatLabel(nameWithoutExt),
-        link,
-      });
-    }
+async function directoryHasIndex(dir: string): Promise<boolean> {
+  for (const name of ['index.md', 'index.mdx']) {
+    try {
+      await stat(join(dir, name));
+      return true;
+    } catch { /* absent */ }
   }
-  
-  // Sort: directories first, then files, both alphabetically
-  items.sort((a, b) => {
-    const aIsDir = 'items' in a;
-    const bIsDir = 'items' in b;
-    if (aIsDir && !bIsDir) return -1;
-    if (!aIsDir && bIsDir) return 1;
-    return a.label.localeCompare(b.label);
-  });
-  
-  return items;
+  return false;
 }
 
 function formatLabel(name: string): string {
   return name
     .split('-')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
     .join(' ');
 }
 
-function titleFromFrontmatter(content: string): string | undefined {
-  const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n/);
-  if (!frontmatterMatch) {
-    return undefined;
-  }
-
-  const match = frontmatterMatch[1].match(/^title:\s*(.+)$/m);
-  if (!match) {
-    return undefined;
-  }
-
-  const raw = match[1].trim();
-  if (raw.startsWith('"') || raw.startsWith("'")) {
-    try {
-      return JSON.parse(raw.replace(/^'/, '"').replace(/'$/, '"'));
-    } catch {
-      return raw.replace(/^['"]|['"]$/g, '');
-    }
-  }
-
-  return raw;
-}
-
-/** Use the index page title as the sidebar group label when one exists. */
+/** Read H1 from the aggregated index.md as the sidebar group label. */
 async function sidebarGroupLabel(project: Project): Promise<string> {
-  for (const filename of ['index.md', 'index.mdx']) {
-    const indexPath = join(CONTENT_DIR, project.slug, filename);
-    try {
-      const content = await Bun.file(indexPath).text();
-      const title = titleFromFrontmatter(content);
-      if (title) {
-        return title;
-      }
-    } catch {
-      continue;
-    }
-  }
-
+  const indexPath = join(CONTENT_DIR, project.slug, 'index.md');
+  try {
+    const text = await Bun.file(indexPath).text();
+    // Strip frontmatter if any slipped through, then look for H1
+    const body = text.replace(/^---[\s\S]*?\n---\n/, '');
+    const h1 = body.match(/^#\s+(.+?)(?:\s*\{#[^}]*\})?\s*$/m);
+    if (h1) return h1[1].trim();
+  } catch { /* absent */ }
   return project.name;
-}
-
-/**
- * Write the updated Astro config with sidebar
- */
-async function writeAstroConfig(sidebar: (SidebarGroup | SidebarItem)[]): Promise<void> {
-  const config = `import { defineConfig } from 'astro/config';
-import starlight from '@astrojs/starlight';
-import mermaid from 'astro-mermaid';
-import { remarkQuote } from './src/plugins/remark-quote.js';
-
-function quoteBoxIntegration() {
-  return {
-    name: 'quote-box',
-    hooks: {
-      'astro:config:setup': ({ config, updateConfig }) => {
-        updateConfig({
-          markdown: {
-            remarkPlugins: [...(config.markdown?.remarkPlugins || []), remarkQuote],
-          },
-        });
-      },
-    },
-  };
-}
-
-export default defineConfig({
-  trailingSlash: 'always',
-  vite: {
-    resolve: {
-      alias: {
-        '@': new URL('./src', import.meta.url).pathname,
-      },
-    },
-  },
-  integrations: [
-    mermaid({
-      autoTheme: true,
-      mermaidConfig: {
-        securityLevel: 'loose',
-        flowchart: {
-          useMaxWidth: false,
-          htmlLabels: true,
-          nodeSpacing: 28,
-          rankSpacing: 40,
-          padding: 12,
-        },
-        themeVariables: {
-          fontSize: '17px',
-        },
-      },
-    }),
-    starlight({
-      title: 'ScottyLabs Docs',
-      description: 'Unified documentation for ScottyLabs projects',
-      favicon: '/favicon.ico',
-      social: {
-        github: 'https://github.com/ScottyLabs',
-      },
-      components: {
-        MarkdownContent: './src/components/MarkdownContent.astro',
-        Pagination: './src/components/Pagination.astro',
-      },
-      sidebar: ${JSON.stringify(sidebar, null, 8).replace(/"([^"]+)":/g, '$1:')},
-      head: [
-        {
-          tag: 'meta',
-          attrs: {
-            'http-equiv': 'Cache-Control',
-            content: 'no-cache, no-store, must-revalidate',
-          },
-        },
-      ],
-      customCss: [
-        './src/styles/scalar-theme.css',
-        './src/styles/heading-links.css',
-        './src/styles/mermaid.css',
-        './src/styles/excalidraw.css',
-        './src/styles/quote.css',
-      ],
-    }),
-    quoteBoxIntegration(),
-  ],
-});
-`;
-  
-  await writeFile('astro.config.mjs', config);
-  console.log('  ✓ astro.config.mjs updated with dynamic sidebar');
 }
