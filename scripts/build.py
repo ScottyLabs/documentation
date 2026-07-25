@@ -3,7 +3,10 @@
 ScottyLabs documentation hub build.
 
 Aggregates project docs from sibling repos / Codeberg clones, generates
-SUMMARY.md and repos.json, then runs mdbook.
+SUMMARY.md and repos.json, then runs mdbook.  Projects with type="nix" are
+built via `nix build .#docs` after mdbook and their HTML is dropped directly
+into the book output directory.  Projects with type="mdbook" are built via
+`mdbook build` inside the cloned repo and injected the same way.
 
 Depends only on Python 3.11+ stdlib (tomllib) + git + mdbook in PATH.
 """
@@ -27,6 +30,8 @@ SKIP_FILES  = frozenset({"AGENTS.md", "SUMMARY.md", "SUMMARY.mdx"})
 SKIP_INDEX  = frozenset({"README.md", "readme.md"})
 # Shell pages that live at the CONTENT_DIR root and must not be overwritten
 SKIP_SHELL  = frozenset({"index.md", "getting-started.md", "404.md", "favicon.ico", "repos.json"})
+# Directories never aggregated (build outputs, package caches, etc.)
+SKIP_DIRS   = frozenset({"book", "target", "node_modules", "dist", "vendor"})
 
 # These slugs read from the documentation hub itself, not a cloned repo
 HUB_LOCAL_SLUGS = frozenset({"documentation", "scottylabs"})
@@ -59,6 +64,7 @@ def load_manifest() -> list[dict]:
             "repo":     p.get("repo", codeberg(p["slug"])),
             "type":     p.get("type", "starlight"),
             "docs_dir": p.get("docs_dir", "docs"),
+            "sibling":  p.get("sibling"),
         })
     return out
 
@@ -146,7 +152,7 @@ def resolve_roots(projects: list[dict]) -> dict[str, Path]:
 
 
 def _resolve_one(p: dict) -> Path | None:
-    sibling = Path("..") / p["slug"]
+    sibling = Path("..") / (p.get("sibling") or p["slug"])
     if sibling.is_dir() and any(e for e in sibling.iterdir() if e.name != ".git"):
         print(f"  ✓ {p['name']} ({p['slug']}) → monorepo {sibling}")
         return sibling
@@ -184,6 +190,14 @@ def aggregate(projects: list[dict], roots: dict[str, Path]) -> None:
 
 def _aggregate_project(p: dict, root: Path) -> None:
     print(f"  Processing {p['name']}...")
+
+    if p.get("type") == "mdbook":
+        # mdbook projects are built by build_mdbook_docs() and injected directly
+        # into book/<slug>/ after the hub mdbook run; no aggregation or SUMMARY
+        # entry needed.
+        print(f"  ↷ {p['name']} (mdbook): built separately, skipping aggregation")
+        return
+
     is_hub  = p["slug"] in HUB_LOCAL_SLUGS
     src_dir = root / p.get("docs_dir", "docs")
     target  = CONTENT_DIR / p["slug"]
@@ -211,6 +225,10 @@ def _aggregate_project(p: dict, root: Path) -> None:
 def _copy_tree(src: Path, dst: Path, p: dict, *, is_hub: bool, rel: str = "") -> None:
     for entry in sorted(src.iterdir()):
         if entry.is_dir():
+            # skip hidden dirs (.obsidian, .forgejo, .rules, etc.) and
+            # well-known build output dirs that should never be aggregated
+            if entry.name.startswith(".") or entry.name in SKIP_DIRS:
+                continue
             sub = dst / entry.name
             sub.mkdir(exist_ok=True)
             _copy_tree(entry, sub, p, is_hub=is_hub, rel=f"{rel}/{entry.name}" if rel else entry.name)
@@ -273,6 +291,8 @@ def generate_summary(projects: list[dict]) -> None:
     # scottylabs org docs first, then alphabetical order
     ordered = sorted(projects, key=lambda p: (0 if p["slug"] == "scottylabs" else 1, p["slug"]))
     for p in ordered:
+        if p.get("type") == "mdbook":
+            continue  # built separately, injected post-mdbook; no sidebar entry
         entry = _summary_entry(p)
         if entry:
             lines.append(entry)
@@ -328,6 +348,41 @@ def copy_favicon() -> None:
         shutil.copy2(src, dst)
 
 
+# ── mdbook-built documentation ────────────────────────────────────────────────
+
+def build_mdbook_docs(projects: list[dict], roots: dict[str, Path]) -> None:
+    """Build external repos that carry their own book.toml.
+
+    Runs `mdbook build` inside the cloned/sibling repo, then copies the
+    resulting book/ directory to book/<slug>/ in the hub output.  These
+    projects get their own independent sidebar and are not listed in the hub
+    SUMMARY.md; accessible at the URL but not surfaced in the hub nav.
+    """
+    mdbook_projects = [p for p in projects if p.get("type") == "mdbook" and p["slug"] in roots]
+    if not mdbook_projects:
+        return
+    print("\n📖 Building external mdbook projects...\n")
+    book_dir = Path("book")
+    for p in mdbook_projects:
+        root = roots[p["slug"]]
+        print(f"  Building {p['name']} (mdbook build in {root})...")
+        r = subprocess.run(
+            ["mdbook", "build"],
+            cwd=root,
+            capture_output=True,
+            text=True,
+        )
+        if r.returncode != 0:
+            print(f"  ⚠  mdbook build failed for {p['name']}, skipping:\n{r.stderr.strip()}")
+            continue
+        src = root / "book"
+        dest = book_dir / p["slug"]
+        shutil.rmtree(dest, ignore_errors=True)
+        shutil.copytree(src, dest)
+        print(f"  ✓ {p['name']} → {dest}")
+    print("✅ External mdbook docs built\n")
+
+
 # ── Entry point ──────────────────────────────────────────────────────────────
 
 def main() -> None:
@@ -351,6 +406,8 @@ def main() -> None:
     r = subprocess.run(["mdbook", "build"])
     if r.returncode != 0:
         sys.exit(r.returncode)
+
+    build_mdbook_docs(projects, roots)
 
     print("\n✨ Build complete\n")
 

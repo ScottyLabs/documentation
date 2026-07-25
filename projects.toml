@@ -17,6 +17,15 @@ type = "starlight"
 docs_dir = "org-docs/scottylabs"
 description = "Organization-wide guides, processes, and resources"
 
+# DevOps runbooks: built with its own mdbook, injected at /devops.
+# Not listed in the hub sidebar, accessible by URL only.
+[[project]]
+slug = "devops"
+name = "DevOps Runbooks"
+repo = "https://codeberg.org/ScottyLabs/devops-troubleshooting-docs"
+type = "mdbook"
+sibling = "devops-troubleshooting-docs"
+
 # Projects with `docs: true` in governance are auto-discovered
 # No need to add them here unless you want to override defaults
 
