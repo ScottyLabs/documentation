@@ -14,14 +14,11 @@ on:
 jobs:
   build-and-deploy:
     name: Build and Deploy
-    runs-on: docker
+    runs-on: native
     steps:
       - uses: https://code.forgejo.org/actions/checkout@v6
         with:
           persist-credentials: false
-
-      - name: Install Nix
-        uses: https://github.com/DeterminateSystems/nix-installer-action@v16
 
       - name: Build documentation
         run: nix shell nixpkgs#python3 nixpkgs#mdbook nixpkgs#mdbook-mermaid --command python3 scripts/build.py
