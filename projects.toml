@@ -22,7 +22,7 @@ description = "Organization-wide guides, processes, and resources"
 [[project]]
 slug = "devops"
 name = "DevOps Runbooks"
-repo = "https://codeberg.org/ScottyLabs/devops-troubleshooting-docs"
+repo = "https://git.cmu.dev/ScottyLabs/devops-troubleshooting-docs"
 type = "mdbook"
 sibling = "devops-troubleshooting-docs"
 
