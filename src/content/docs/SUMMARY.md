@@ -18,7 +18,7 @@
     - [Git Best Practices](scottylabs/development/git-best-practices.md)
     - [Pr Process](scottylabs/development/pr-process.md)
   - [Onboarding]()
-    - [Codeberg Setup](scottylabs/onboarding/codeberg-setup.md)
+    - [Forgejo Setup](scottylabs/onboarding/forgejo-setup.md)
     - [Contributing](scottylabs/onboarding/contributing.md)
     - [Labrador To Tech](scottylabs/onboarding/labrador-to-tech.md)
   - [Organization]()

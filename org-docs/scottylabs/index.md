@@ -8,7 +8,7 @@ For a less technical introduction to ScottyLabs, check out the [ScottyLabs websi
 
 ## Sections
 
-- **Onboarding**: [Codeberg Setup](/scottylabs/onboarding/codeberg-setup/), [Contributing](/scottylabs/onboarding/contributing/), [Labrador to Tech](/scottylabs/onboarding/labrador-to-tech/)
+- **Onboarding**: [Forgejo Setup](/scottylabs/onboarding/forgejo-setup/), [Contributing](/scottylabs/onboarding/contributing/), [Labrador to Tech](/scottylabs/onboarding/labrador-to-tech/)
 - **Development**: [PR Process](/scottylabs/development/pr-process/), [AI Code Reviewers](/scottylabs/development/ai-code-reviewers/), [Deprecation Guideline](/scottylabs/development/deprecation-guideline/)
 - **Platform**: [Credentials](/scottylabs/platform/credentials/), [GitHub Organizations](/scottylabs/platform/github-orgs/), [Emails](/scottylabs/platform/emails/)
 - **Community**: [Communication](/scottylabs/community/communication/), [Resources](/scottylabs/community/resources/)
@@ -17,7 +17,7 @@ For a less technical introduction to ScottyLabs, check out the [ScottyLabs websi
 
 ## Getting access
 
-New contributors should [sign up on Codeberg](/scottylabs/onboarding/codeberg-setup/), then follow [Contributing](/scottylabs/onboarding/contributing/) to join a team in Governance.
+New contributors should [sign up on Forgejo](/scottylabs/onboarding/forgejo-setup/), then follow [Contributing](/scottylabs/onboarding/contributing/) to join a team in Governance.
 
 ## Do you have any questions?
 

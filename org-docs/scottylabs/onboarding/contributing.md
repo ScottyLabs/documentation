@@ -52,7 +52,7 @@ that you will be working on.
 
 ### Setup and Develop
 
-[Sign up on Codeberg](/scottylabs/onboarding/codeberg-setup/) if you do not have an account. That page has SSH setup and optional commit signing. Repository-specific setup is in each project's docs.
+[Sign up on Forgejo](/scottylabs/onboarding/forgejo-setup/) if you do not have an account. That page has SSH setup and optional commit signing. Repository-specific setup is in each project's docs.
 
 ### Submit a Pull Request and Get Credited as a Contributor
 

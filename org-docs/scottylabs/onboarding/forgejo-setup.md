@@ -1,5 +1,5 @@
 ---
-title: Codeberg Setup
+title: Forgejo Setup
 ---
 
 [Sign up on git.cmu.dev](https://git.cmu.dev/user/sign_up).
