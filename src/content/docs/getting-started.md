@@ -1,10 +1,3 @@
----
-title: Getting Started
-description: Learn how to use and contribute to ScottyLabs projects
-project: documentation
-repo: https://codeberg.org/ScottyLabs/documentation
----
-
 Welcome! This documentation hub aggregates documentation from multiple ScottyLabs repositories.
 
 ## For Users
