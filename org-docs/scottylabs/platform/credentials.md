@@ -7,7 +7,7 @@ title: Credentials
 ### UI Login
 
 You can login to the [vault](https://secrets.scottylabs.org/ui/vault/auth?with=oidc)
-by pressing the "Sign in with OIDC Provider" button with Method "oidc". Press "ScottyLabs" listed under "Secrets Engines" and navigate to the file you have permissions to access in your team's folder to view the secrets. If you see the following error, it means that you are not in any ScottyLabs [Vault group](https://codeberg.org/scottylabs/governance/src/branch/main/__meta/synchronizer/README.md#hashicorp-vault), so you are not able to log into the vault.
+by pressing the "Sign in with OIDC Provider" button with Method "oidc". Press "ScottyLabs" listed under "Secrets Engines" and navigate to the file you have permissions to access in your team's folder to view the secrets. If you see the following error, it means that you are not in any ScottyLabs [Vault group](https://git.cmu.dev/ScottyLabs/governance/src/branch/main/__meta/synchronizer/README.md#hashicorp-vault), so you are not able to log into the vault.
 
 _Well we don't want any CMU student to use our Vault, right?_
 
@@ -58,6 +58,6 @@ Use [VaultWarden](https://vault.scottylabs.org/#/vault?organizationId=3ef62a20-2
 
 ## Bitwarden
 
-Use [BitWarden](https://vault.bitwarden.com/) for storing login credentials that will only be accessed by the [Tech Leadership Maintainers](https://codeberg.org/scottylabs/governance/src/branch/main/data/teams/leadership.toml).
+Use [BitWarden](https://vault.bitwarden.com/) for storing login credentials that will only be accessed by the [Tech Leadership Maintainers](https://git.cmu.dev/ScottyLabs/governance/src/branch/main/data/teams/leadership.toml).
 
 The passwords to Bitwarden is meant to be stored locally in these individuals' own password manager and may not be updated without updating all relevant people.

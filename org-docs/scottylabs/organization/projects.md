@@ -4,7 +4,7 @@ title: Projects
 
 ## Public Documentation
 
-See [governance teams](https://codeberg.org/scottylabs/governance/src/branch/main/data/teams) and each repository's README and wiki.
+See [governance teams](https://git.cmu.dev/ScottyLabs/governance/src/branch/main/data/teams) and each repository's README and wiki.
 
 ## Internal Documentations
 

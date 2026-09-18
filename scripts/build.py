@@ -40,7 +40,7 @@ HUB_LOCAL_SLUGS = frozenset({"documentation", "scottylabs"})
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
 def codeberg(name: str) -> str:
-    return f"https://codeberg.org/ScottyLabs/{name}"
+    return f"https://git.cmu.dev/ScottyLabs/{name}"
 
 def title_case(slug: str) -> str:
     return " ".join(w.capitalize() for w in re.split(r"[-_ ]+", slug) if w)

@@ -4,7 +4,7 @@ title: Documentation Hub
 
 # Documentation Hub
 
-This site aggregates documentation from ScottyLabs projects. Repositories are included by default; opt out with `docs = false` in [governance](https://codeberg.org/ScottyLabs/governance).
+This site aggregates documentation from ScottyLabs projects. Repositories are included by default; opt out with `docs = false` in [governance](https://git.cmu.dev/ScottyLabs/governance).
 
 ## How it works
 

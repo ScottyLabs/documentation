@@ -1,7 +1,7 @@
 {
   "type": "excalidraw",
   "version": 2,
-  "source": "https://codeberg.org/ScottyLabs/documentation",
+  "source": "https://git.cmu.dev/ScottyLabs/documentation",
   "elements": [
     {
       "id": "rect-1",
@@ -35,7 +35,7 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "link": "https://codeberg.org/ScottyLabs/governance"
+      "link": "https://git.cmu.dev/ScottyLabs/governance"
     },
     {
       "id": "text-2",
@@ -248,7 +248,7 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "link": "https://codeberg.org/ScottyLabs/observability"
+      "link": "https://git.cmu.dev/ScottyLabs/observability"
     },
     {
       "id": "text-8",
@@ -319,7 +319,7 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "link": "https://codeberg.org/ScottyLabs/documentation"
+      "link": "https://git.cmu.dev/ScottyLabs/documentation"
     },
     {
       "id": "text-10",
@@ -390,7 +390,7 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "link": "https://codeberg.org/ScottyLabs/infrastructure"
+      "link": "https://git.cmu.dev/ScottyLabs/infrastructure"
     },
     {
       "id": "text-12",
@@ -461,7 +461,7 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "link": "https://codeberg.org/ScottyLabs/kennel"
+      "link": "https://git.cmu.dev/ScottyLabs/kennel"
     },
     {
       "id": "text-14",
@@ -532,7 +532,7 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "link": "https://codeberg.org/ScottyLabs/devenv"
+      "link": "https://git.cmu.dev/ScottyLabs/devenv"
     },
     {
       "id": "text-16",
@@ -603,7 +603,7 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "link": "https://codeberg.org/ScottyLabs/keycloak-theme"
+      "link": "https://git.cmu.dev/ScottyLabs/keycloak-theme"
     },
     {
       "id": "text-18",
@@ -674,7 +674,7 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "link": "https://codeberg.org/ScottyLabs/internet-archive"
+      "link": "https://git.cmu.dev/ScottyLabs/internet-archive"
     },
     {
       "id": "text-20",
@@ -2930,7 +2930,7 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "link": "https://codeberg.org/ScottyLabs/kennel"
+      "link": "https://git.cmu.dev/ScottyLabs/kennel"
     },
     {
       "id": "text-82",
@@ -3001,7 +3001,7 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "link": "https://codeberg.org/ScottyLabs/courses"
+      "link": "https://git.cmu.dev/ScottyLabs/courses"
     },
     {
       "id": "text-84",
@@ -3072,7 +3072,7 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "link": "https://codeberg.org/ScottyLabs/quest"
+      "link": "https://git.cmu.dev/ScottyLabs/quest"
     },
     {
       "id": "text-86",
@@ -3143,7 +3143,7 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "link": "https://codeberg.org/ScottyLabs/housing"
+      "link": "https://git.cmu.dev/ScottyLabs/housing"
     },
     {
       "id": "text-88",
@@ -3214,7 +3214,7 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "link": "https://codeberg.org/ScottyLabs/tartan-vote"
+      "link": "https://git.cmu.dev/ScottyLabs/tartan-vote"
     },
     {
       "id": "text-90",
@@ -3285,7 +3285,7 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "link": "https://codeberg.org/ScottyLabs/bus-sign"
+      "link": "https://git.cmu.dev/ScottyLabs/bus-sign"
     },
     {
       "id": "text-92",
@@ -3356,7 +3356,7 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "link": "https://codeberg.org/ScottyLabs/dalmatian"
+      "link": "https://git.cmu.dev/ScottyLabs/dalmatian"
     },
     {
       "id": "text-94",
@@ -3427,7 +3427,7 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "link": "https://codeberg.org/ScottyLabs/discord-verify"
+      "link": "https://git.cmu.dev/ScottyLabs/discord-verify"
     },
     {
       "id": "text-96",
@@ -3498,7 +3498,7 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "link": "https://codeberg.org/ScottyLabs/cmugpt-surface"
+      "link": "https://git.cmu.dev/ScottyLabs/cmugpt-surface"
     },
     {
       "id": "text-98",
@@ -3569,7 +3569,7 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "link": "https://codeberg.org/ScottyLabs/cmugpt-agent"
+      "link": "https://git.cmu.dev/ScottyLabs/cmugpt-agent"
     },
     {
       "id": "text-100",
@@ -3640,7 +3640,7 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "link": "https://codeberg.org/ScottyLabs/mcp-server"
+      "link": "https://git.cmu.dev/ScottyLabs/mcp-server"
     },
     {
       "id": "text-102",
@@ -3711,7 +3711,7 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "link": "https://codeberg.org/ScottyLabs/sms-surface"
+      "link": "https://git.cmu.dev/ScottyLabs/sms-surface"
     },
     {
       "id": "text-104",
@@ -3782,7 +3782,7 @@
       "strokeStyle": "solid",
       "roughness": 1,
       "opacity": 100,
-      "link": "https://codeberg.org/ScottyLabs/components"
+      "link": "https://git.cmu.dev/ScottyLabs/components"
     },
     {
       "id": "text-106",

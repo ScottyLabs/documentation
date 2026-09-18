@@ -7,7 +7,7 @@ set -euo pipefail
 
 EVENT_TYPE="${1:?event type required (e.g. governance-updated)}"
 TOKEN="${DOCS_TRIGGER_TOKEN:?DOCS_TRIGGER_TOKEN must be set}"
-API_BASE="${FORGEJO_API_BASE:-https://codeberg.org/api/v1}"
+API_BASE="${FORGEJO_API_BASE:-https://git.cmu.dev/api/v1}"
 TARGET_REPO="${DOCS_TARGET_REPO:-scottylabs/documentation}"
 
 curl -fsS -X POST \

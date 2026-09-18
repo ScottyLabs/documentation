@@ -14,7 +14,7 @@ Use **search** (⌘K) or browse the sidebar to find what you need.
 
 ## For Contributors
 
-Repositories registered in [governance](https://codeberg.org/ScottyLabs/governance) are included in this hub by default. To exclude a repo, set `docs = false` in its team entry.
+Repositories registered in [governance](https://git.cmu.dev/ScottyLabs/governance) are included in this hub by default. To exclude a repo, set `docs = false` in its team entry.
 
 The build system automatically:
 

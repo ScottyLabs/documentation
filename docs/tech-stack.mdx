@@ -8,7 +8,7 @@ ScottyLabs platform overview. **Pan and zoom** the diagram below (scroll or pinc
 
 The diagram reads left to right: **governance**, then **infra-01** and **deploy-01**. On every host, **Tailscale** (Headscale client) and **host exporters** run alongside **Caddy**. Public web traffic hits **Caddy first**; tailnet-only services like pgAdmin use **Headscale → Caddy → app** (the reverse order from the [Caddy OIDC proxy](#caddy-oidc-proxy) pattern). Cross-host links are described in prose below the diagram.
 
-Sources: [governance](https://codeberg.org/ScottyLabs/governance) team data, [infrastructure](https://codeberg.org/ScottyLabs/infrastructure) NixOS hosts, and this monorepo checkout.
+Sources: [governance](https://git.cmu.dev/ScottyLabs/governance) team data, [infrastructure](https://git.cmu.dev/ScottyLabs/infrastructure) NixOS hosts, and this monorepo checkout.
 
 ## Platform
 
@@ -73,7 +73,7 @@ Kennel builds and deploys repos marked `kennel = true` in governance. Those depl
 Grafana on infra-01 queries the **Prometheus scraper** there. Metrics come from two layers:
 
 1. **Host exporters** on every NixOS host (infra-01, deploy-01, snoopy, bus-sign-display) — node, systemd, cAdvisor, and comin metrics. These appear as **Host exporters** nodes in the platform diagram.
-2. **Service metrics** on individual platform services — marked with **\*** or an orange border in the diagram. Scraped by Prometheus on infra-01 (see [`observability.nix`](https://codeberg.org/ScottyLabs/infrastructure/src/branch/main/hosts/infra-01/observability.nix)). Dashboards and alerts live in [observability](https://codeberg.org/ScottyLabs/observability).
+2. **Service metrics** on individual platform services — marked with **\*** or an orange border in the diagram. Scraped by Prometheus on infra-01 (see [`observability.nix`](https://git.cmu.dev/ScottyLabs/infrastructure/src/branch/main/hosts/infra-01/observability.nix)). Dashboards and alerts live in [observability](https://git.cmu.dev/ScottyLabs/observability).
 
 ### Host exporters (every NixOS host)
 
@@ -114,10 +114,10 @@ Garage WebAdmin uses the **Caddy OIDC proxy** pattern; Garage S3 API (`s3.scotty
 
 | Layer | Role | Primary repos |
 | ----- | ---- | ------------- |
-| Governance | Teams, repos, identities, and OpenTofu for Forgejo/GitHub/Keycloak/Discord/Slack | [governance](https://codeberg.org/ScottyLabs/governance) |
-| Infrastructure | Declarative NixOS on campus VMs; comin auto-deploys from Codeberg | [infrastructure](https://codeberg.org/ScottyLabs/infrastructure) |
-| Platform | Shared identity, secrets, storage, CI, chat bridges, observability | [observability](https://codeberg.org/ScottyLabs/observability), [keycloak-theme](https://codeberg.org/ScottyLabs/keycloak-theme) |
-| Deploy | Branch-based preview and production deploys via Nix builds | [kennel](https://codeberg.org/ScottyLabs/kennel), [devenv](https://codeberg.org/ScottyLabs/devenv) |
+| Governance | Teams, repos, identities, and OpenTofu for Forgejo/GitHub/Keycloak/Discord/Slack | [governance](https://git.cmu.dev/ScottyLabs/governance) |
+| Infrastructure | Declarative NixOS on campus VMs; comin auto-deploys from Codeberg | [infrastructure](https://git.cmu.dev/ScottyLabs/infrastructure) |
+| Platform | Shared identity, secrets, storage, CI, chat bridges, observability | [observability](https://git.cmu.dev/ScottyLabs/observability), [keycloak-theme](https://git.cmu.dev/ScottyLabs/keycloak-theme) |
+| Deploy | Branch-based preview and production deploys via Nix builds | [kennel](https://git.cmu.dev/ScottyLabs/kennel), [devenv](https://git.cmu.dev/ScottyLabs/devenv) |
 | Applications | Product repos deployed through Kennel when `kennel = true` in governance | See team pages under [Projects](/scottylabs/organization/projects/) |
 
 ## Hosts
@@ -127,7 +127,7 @@ Garage WebAdmin uses the **Caddy OIDC proxy** pattern; Garage S3 API (`s3.scotty
 | **infra-01** | Tailscale client; **Caddy** → public platform services; Headscale server + Headplane; **Headscale → Caddy → pgAdmin** (tailnet); Prometheus scraper + Grafana/Loki/Tempo |
 | **deploy-01** | Tailscale client; **Caddy → kennel** → Kennel deployments; **Headscale → Caddy → pgAdmin** (tailnet); internet-archive batch job |
 | **snoopy** | Tailscale client + host exporters (scraped by Prometheus on infra-01) |
-| **bus-sign-display** | On-prem display for the [bus-sign](https://codeberg.org/ScottyLabs/bus-sign) project |
+| **bus-sign-display** | On-prem display for the [bus-sign](https://git.cmu.dev/ScottyLabs/bus-sign) project |
 
 ## Teams and repos
 

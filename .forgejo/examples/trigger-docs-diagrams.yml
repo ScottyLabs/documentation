@@ -26,6 +26,6 @@ jobs:
             -H "Authorization: token ${DOCS_TRIGGER_TOKEN}" \
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
-            https://codeberg.org/api/v1/repos/scottylabs/documentation/dispatches \
+            https://git.cmu.dev/api/v1/repos/scottylabs/documentation/dispatches \
             -d '{"event_type": "diagrams-updated"}'
           echo "✅ Documentation rebuild triggered"

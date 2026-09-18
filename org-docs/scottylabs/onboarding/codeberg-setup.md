@@ -2,7 +2,7 @@
 title: Codeberg Setup
 ---
 
-[Sign up on codeberg.org](https://codeberg.org/user/sign_up).
+[Sign up on git.cmu.dev](https://git.cmu.dev/user/sign_up).
 
 Use the **same username and email** as your GitHub account. That is all you really need to do in this document.
 
@@ -30,12 +30,12 @@ SSH is how Git proves you are you when you clone and push. You make a key pair o
 
    Copy the whole line (`ssh-ed25519 …`).
 
-3. **Add it on Codeberg:** open [SSH / GPG keys](https://codeberg.org/user/settings/keys), click **Add key**, paste, save.
+3. **Add it on Codeberg:** open [SSH / GPG keys](https://git.cmu.dev/user/settings/keys), click **Add key**, paste, save.
 
 4. **Test it:**
 
    ```bash
-   ssh -T git@codeberg.org
+   ssh -T git@git.cmu.dev
    ```
 
    You should see a message with your username, not `Permission denied`.
@@ -46,7 +46,7 @@ If `ssh-add` complains later, run `ssh-add ~/.ssh/id_ed25519` and enter your pas
 
 ### Commit signing (optional)
 
-Add your public key under [SSH / GPG keys](https://codeberg.org/user/settings/keys) on Codeberg and click **Verify** to prove ownership.
+Add your public key under [SSH / GPG keys](https://git.cmu.dev/user/settings/keys) on Codeberg and click **Verify** to prove ownership.
 
 **SSH signing** (Git 2.34+). You can use your auth key or a separate signing-only key:
 
@@ -65,4 +65,4 @@ git config --global commit.gpgSign true
 
 ## Next steps
 
-After SSH is working, follow [Contributing](/scottylabs/onboarding/contributing/) to request access through [Governance](https://codeberg.org/scottylabs/governance). See [GitHub Organizations](/scottylabs/platform/github-orgs/) for how ScottyLabs uses GitHub and Codeberg together.
+After SSH is working, follow [Contributing](/scottylabs/onboarding/contributing/) to request access through [Governance](https://git.cmu.dev/ScottyLabs/governance). See [GitHub Organizations](/scottylabs/platform/github-orgs/) for how ScottyLabs uses GitHub and Codeberg together.

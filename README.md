@@ -52,7 +52,7 @@ curl -sI -H "Accept: text/html" https://docs.scottylabs.org/scottylabs/onboardin
 curl -sI -H "Accept: text/markdown" https://docs.scottylabs.org/scottylabs/onboarding/contributing/
 ```
 
-If the second request still returns `content-type: text/html` with no `Vary: Accept`, apply the `docs.scottylabs.org` Caddy config in [`infrastructure/hosts/infra-01/garage.nix`](https://codeberg.org/ScottyLabs/infrastructure/src/branch/main/hosts/infra-01/garage.nix) on infra-01 (`nixos-rebuild switch`).
+If the second request still returns `content-type: text/html` with no `Vary: Accept`, apply the `docs.scottylabs.org` Caddy config in [`infrastructure/hosts/infra-01/garage.nix`](https://git.cmu.dev/ScottyLabs/infrastructure/src/branch/main/hosts/infra-01/garage.nix) on infra-01 (`nixos-rebuild switch`).
 
 Markdown files are always available at the sibling `index.md` path as a fallback, e.g. `https://docs.scottylabs.org/scottylabs/onboarding/contributing/index.md`.
 
@@ -119,7 +119,7 @@ Once configured, any change to governance (adding/removing `docs = true` flags, 
 
 ```bash
 # Clone the repository
-git clone https://codeberg.org/scottylabs/documentation.git
+git clone https://git.cmu.dev/ScottyLabs/documentation.git
 cd documentation
 
 # Install dependencies
@@ -131,7 +131,7 @@ nix develop
 
 ### Governance Integration
 
-Projects are automatically discovered from the [ScottyLabs governance repository](https://codeberg.org/ScottyLabs/governance). When a repository has `docs = true` in its governance entry (same pattern as `kennel` and `sentry` flags), it's included in the documentation hub.
+Projects are automatically discovered from the [ScottyLabs governance repository](https://git.cmu.dev/ScottyLabs/governance). When a repository has `docs = true` in its governance entry (same pattern as `kennel` and `sentry` flags), it's included in the documentation hub.
 
 **To add your project's documentation:**
 
@@ -170,7 +170,7 @@ export_command = "cargo run --bin export-openapi"
 [[project]]
 slug = "my-project"
 name = "My Project"
-repo = "https://codeberg.org/scottylabs/my-project"
+repo = "https://git.cmu.dev/ScottyLabs/my-project"
 type = "starlight"
 docs_dir = "docs"
 description = "Documentation for My Project"
@@ -182,7 +182,7 @@ description = "Documentation for My Project"
 [[project]]
 slug = "guides"
 name = "User Guides"
-repo = "https://codeberg.org/scottylabs/guides"
+repo = "https://git.cmu.dev/ScottyLabs/guides"
 type = "starlight"
 docs_dir = "docs"
 description = "Comprehensive guides for all ScottyLabs services"
@@ -194,7 +194,7 @@ description = "Comprehensive guides for all ScottyLabs services"
 [[project]]
 slug = "common-lib"
 name = "Common Library"
-repo = "https://codeberg.org/scottylabs/common-lib"
+repo = "https://git.cmu.dev/ScottyLabs/common-lib"
 type = "rust"
 docs_dir = "docs"
 description = "Shared Rust utilities and types"
@@ -206,7 +206,7 @@ description = "Shared Rust utilities and types"
 [[project]]
 slug = "courses-api"
 name = "Courses API"
-repo = "https://codeberg.org/scottylabs/courses-backend"
+repo = "https://git.cmu.dev/ScottyLabs/courses-backend"
 type = "openapi"
 docs_dir = "docs"
 openapi_spec = "openapi.json"

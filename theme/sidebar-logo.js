@@ -54,7 +54,7 @@
         logo.href = pathToRoot + 'index.html';
         logo.setAttribute('aria-label', 'ScottyLabs Docs home');
         var img = document.createElement('img');
-        img.src = 'https://codeberg.org/ScottyLabs.png?size=64';
+        img.src = 'https://git.cmu.dev/ScottyLabs.png?size=64';
         img.alt = 'ScottyLabs';
         img.width = 32;
         img.height = 32;
@@ -74,7 +74,7 @@
       if (rightBtns && !document.getElementById('sl-org-links')) {
         var wrap = document.createElement('span');
         wrap.id = 'sl-org-links';
-        wrap.appendChild(makeIconBtn('https://codeberg.org/ScottyLabs', 'ScottyLabs on Codeberg', CB_SVG));
+        wrap.appendChild(makeIconBtn('https://git.cmu.dev/ScottyLabs', 'ScottyLabs on Forgejo', CB_SVG));
         wrap.appendChild(makeIconBtn('https://github.com/ScottyLabs', 'ScottyLabs on GitHub', GH_SVG));
         rightBtns.insertBefore(wrap, rightBtns.firstChild);
       }
@@ -91,7 +91,7 @@
             var isGitHub = repoUrl.indexOf('github.com') !== -1;
             var btn = makeIconBtn(
               repoUrl,
-              'View project source (' + (isGitHub ? 'GitHub' : 'Codeberg') + ')',
+              'View project source (' + (isGitHub ? 'GitHub' : 'Forgejo') + ')',
               isGitHub ? GH_SVG : CB_SVG
             );
             btn.id = 'sl-project-repo';

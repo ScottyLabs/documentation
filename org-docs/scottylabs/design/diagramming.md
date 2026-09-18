@@ -35,7 +35,7 @@ import ExcalidrawDiagram from '@/components/ExcalidrawDiagram.astro';
 
 Optional programmatic diagrams: add `scripts/generate-*-excalidraw.ts` in your repo; the hub runs it before aggregating scenes.
 
-After pushing diagram changes, either rely on the org **push webhook** on `webhooks.scottylabs.org` (infra-01) or copy [`.forgejo/examples/trigger-docs-diagrams.yml`](https://codeberg.org/ScottyLabs/documentation/src/branch/main/.forgejo/examples/trigger-docs-diagrams.yml) into your repo’s `.forgejo/workflows/` with the `DOCS_TRIGGER_TOKEN` secret.
+After pushing diagram changes, either rely on the org **push webhook** on `webhooks.scottylabs.org` (infra-01) or copy [`.forgejo/examples/trigger-docs-diagrams.yml`](https://git.cmu.dev/ScottyLabs/documentation/src/branch/main/.forgejo/examples/trigger-docs-diagrams.yml) into your repo’s `.forgejo/workflows/` with the `DOCS_TRIGGER_TOKEN` secret.
 
 Examples:
 

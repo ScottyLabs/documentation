@@ -106,7 +106,7 @@ the `staging` branch will be merged into the `main` branch, updating the live we
 Once your PR is merged and that you have also come to one
 [ScottyLabs work session](/scottylabs/community/communication/),
 you will be credited as a contributor in the corresponding team in
-[Governance](https://codeberg.org/scottylabs/governance/src/branch/main/data/teams), **forever**!
+[Governance](https://git.cmu.dev/ScottyLabs/governance/src/branch/main/data/teams), **forever**!
 
 ### Acknowledgment
 

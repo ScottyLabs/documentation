@@ -39,8 +39,8 @@ def avatar_url(platform: str, author: str) -> tuple[str, str]:
             f'https://github.com/{handle}.png?size=80',
         )
     return (
-        f'https://codeberg.org/{handle}',
-        f'https://codeberg.org/{handle}.png?size=80',
+        f'https://git.cmu.dev/{handle}',
+        f'https://git.cmu.dev/{handle}.png?size=80',
     )
 
 

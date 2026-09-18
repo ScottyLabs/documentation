@@ -77,7 +77,7 @@ export DOCS_TRIGGER_TOKEN=...
 echo "# test" >> data/test.txt
 git commit -am "test: trigger docs rebuild" && git push
 
-# Check https://codeberg.org/scottylabs/documentation/actions
+# Check https://git.cmu.dev/ScottyLabs/documentation/actions
 ```
 
 ## Automatic governance updates
