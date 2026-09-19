@@ -257,6 +257,10 @@ def _process(src: Path, dst: Path, p: dict, *, root_file: bool) -> None:
         # replace with the canonical project name so titles are consistent.
         body = re.sub(r"^#\s+.+?(?:\s*\{#[^}]*\})?\s*\n", "", body, count=1)
         body = re.sub(r"^\s*<div[^>]*>[\s\S]*?</div>\s*\n*", "", body, count=1, flags=re.IGNORECASE)
+        # Rewrite relative links that use the docs_dir prefix (e.g. docs/foo.md)
+        # so they resolve correctly from the index page on the docs site.
+        docs_dir = re.escape(p.get("docs_dir", "docs"))
+        body = re.sub(rf"\({docs_dir}/", "(", body)
         body = body.lstrip("\n")
         preamble = f"# {p['name']}\n\n"
     else:
