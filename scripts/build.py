@@ -93,18 +93,22 @@ def governance_path() -> Path | None:
 
 
 def discover_governance(gov: Path) -> list[dict]:
-    teams_dir = gov / "data" / "teams"
-    if not teams_dir.is_dir():
+    # Governance stores teams as YAML, but commits a normalized JSON tree at
+    # generated/data.json (kept current by its check-generated CI job), so the
+    # hub needs no YAML parser of its own.
+    data_file = gov / "generated" / "data.json"
+    if not data_file.is_file():
+        print(f"  ⚠  No {data_file}; skipping governance discovery")
+        return []
+    try:
+        with open(data_file, "rb") as f:
+            data = json.load(f)
+    except Exception as exc:
+        print(f"  ⚠  Could not read {data_file}: {exc}")
         return []
     projects: list[dict] = []
-    for toml_file in sorted(teams_dir.glob("*.toml")):
-        try:
-            with open(toml_file, "rb") as f:
-                data = tomllib.load(f)
-        except Exception as exc:
-            print(f"  ⚠  Skipping {toml_file.name}: {exc}")
-            continue
-        team = data.get("team", {})
+    for entry in data.get("teams", []):
+        team = entry.get("team", {})
         for repo in team.get("repos", []):
             _add_project(projects, repo)
         for proj in team.get("projects", []):
@@ -114,15 +118,17 @@ def discover_governance(gov: Path) -> list[dict]:
 
 
 def _add_project(projects: list[dict], repo: dict) -> None:
+    # Inclusion is automatic: governance's repo schema denies unknown fields and
+    # has no opt-out key, so every registered repo is aggregated.
     name = repo.get("name", "")
-    if not name or repo.get("docs") is False:
+    if not name:
         return
     projects.append({
         "slug":     name,
         "name":     title_case(name),
-        "repo":     repo.get("repo", codeberg(name)),
+        "repo":     repo.get("url") or codeberg(name),
         "type":     "starlight",
-        "docs_dir": repo.get("docs_dir", "docs"),
+        "docs_dir": "docs",
     })
 
 
@@ -397,6 +403,11 @@ def main() -> None:
 
     gov = governance_path()
     gov_projects = discover_governance(gov) if gov else []
+    if gov and not gov_projects:
+        sys.exit(
+            f"❌ Governance at {gov} produced no repositories. Its data layout probably "
+            "changed; refusing to publish a site with every project missing."
+        )
     projects = merge_projects(gov_projects, manual)
     print(f"📦 Total projects: {len(projects)}\n")
 

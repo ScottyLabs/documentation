@@ -2,6 +2,7 @@
 dist/
 book/
 .astro/
+__pycache__/
 
 # generated types
 .astro/
