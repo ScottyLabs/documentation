@@ -93,40 +93,50 @@ def governance_path() -> Path | None:
 
 
 def discover_governance(gov: Path) -> list[dict]:
-    # Governance stores teams as YAML, but commits a normalized JSON tree at
-    # generated/data.json (kept current by its check-generated CI job), so the
-    # hub needs no YAML parser of its own.
-    data_file = gov / "generated" / "data.json"
-    if not data_file.is_file():
-        print(f"  ⚠  No {data_file}; skipping governance discovery")
+    teams_dir = gov / "data" / "teams"
+    files = sorted(teams_dir.glob("*.yaml"))
+    if not files:
+        print(f"  ⚠  No team files in {teams_dir}")
         return []
-    try:
-        with open(data_file, "rb") as f:
-            data = json.load(f)
-    except Exception as exc:
-        print(f"  ⚠  Could not read {data_file}: {exc}")
+    # Governance stores teams as YAML and no longer commits a generated JSON
+    # tree, so yq folds the team files into one JSON array and the hub stays on
+    # stdlib json instead of carrying a YAML parser.
+    r = subprocess.run(
+        ["yq", "ea", "-o=json", "-I=0", "[.]", *(str(f) for f in files)],
+        capture_output=True,
+        text=True,
+    )
+    if r.returncode != 0:
+        print(f"  ⚠  yq failed on {teams_dir}: {r.stderr.strip() or 'no output'}")
         return []
+    return projects_from_teams(json.loads(r.stdout))
+
+
+def projects_from_teams(team_files: list[dict]) -> list[dict]:
     projects: list[dict] = []
-    for entry in data.get("teams", []):
-        team = entry.get("team", {})
-        for repo in team.get("repos", []):
+    for entry in team_files:
+        team = entry.get("team") or {}
+        for repo in team.get("repos") or []:
             _add_project(projects, repo)
-        for proj in team.get("projects", []):
-            for repo in proj.get("repos", []):
+        for proj in team.get("projects") or []:
+            for repo in proj.get("repos") or []:
                 _add_project(projects, repo)
     return projects
 
 
 def _add_project(projects: list[dict], repo: dict) -> None:
     # Inclusion is automatic: governance's repo schema denies unknown fields and
-    # has no opt-out key, so every registered repo is aggregated.
+    # has no opt-out key, so every registered repo is aggregated. Private repos
+    # are the exception: CI clones anonymously and the site is public.
     name = repo.get("name", "")
-    if not name:
+    if not name or repo.get("private"):
         return
     projects.append({
         "slug":     name,
         "name":     title_case(name),
-        "repo":     repo.get("url") or codeberg(name),
+        # governance's `url` is the repo's website (dining-api points at its
+        # deployed API), not a git remote; every repo lives in the org by name.
+        "repo":     codeberg(name),
         "type":     "starlight",
         "docs_dir": "docs",
     })

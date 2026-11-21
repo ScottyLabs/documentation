@@ -23,7 +23,7 @@ jobs:
           persist-credentials: false
 
       - name: Build documentation
-        run: nix shell nixpkgs#python3 nixpkgs#mdbook nixpkgs#mdbook-mermaid --command python3 scripts/build.py
+        run: nix shell nixpkgs#python3 nixpkgs#yq-go nixpkgs#mdbook nixpkgs#mdbook-mermaid --command python3 scripts/build.py
 
       - name: Upload to Garage
         if: github.ref == 'refs/heads/main'
